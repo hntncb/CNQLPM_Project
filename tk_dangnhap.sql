@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th7 23, 2024 lúc 07:05 AM
+-- Thời gian đã tạo: Th7 24, 2024 lúc 03:40 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -28,16 +28,41 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `tk_dangnhap` (
-  `user` varchar(30) DEFAULT NULL,
-  `password` varchar(20) DEFAULT NULL
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(50) NOT NULL,
+  `user_type` enum('admin','user') NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `tk_dangnhap`
 --
 
-INSERT INTO `tk_dangnhap` (`user`, `password`) VALUES
-('a', 'a');
+INSERT INTO `tk_dangnhap` (`id`, `username`, `password`, `user_type`) VALUES
+(1, 'admin', 'a', 'admin'),
+(2, 'user', 'a', 'user'),
+(3, 'a', 'a', 'user');
+
+--
+-- Chỉ mục cho các bảng đã đổ
+--
+
+--
+-- Chỉ mục cho bảng `tk_dangnhap`
+--
+ALTER TABLE `tk_dangnhap`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- AUTO_INCREMENT cho các bảng đã đổ
+--
+
+--
+-- AUTO_INCREMENT cho bảng `tk_dangnhap`
+--
+ALTER TABLE `tk_dangnhap`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
