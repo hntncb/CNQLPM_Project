@@ -1,5 +1,14 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package QLNV;
 
+/**
+ *
+ * @author Hoang
+ */
 public class NhanVien {
     private int id;
     private String hoTen;
@@ -17,7 +26,7 @@ public class NhanVien {
     }
 
     public NhanVien() {
-        this.id = 0;
+        this.id = 0; // Initialize id to a default value
     }
 
     public NhanVien(int id, String hoTen, String namSinh, String diaChi, String sdt, String chucVu) {

@@ -13,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 public class DangNhap extends JFrame implements ActionListener {
     private JLabel titleLabel, usernameLabel, passwordLabel;
@@ -51,6 +50,8 @@ public class DangNhap extends JFrame implements ActionListener {
         loginButton.setBounds(100, 120, 100, 30);
         loginButton.addActionListener(this);
         add(loginButton);
+
+        passwordField.addActionListener(e -> loginButton.doClick());
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -68,18 +69,17 @@ public class DangNhap extends JFrame implements ActionListener {
             }
         }
     }
-
+    
     private boolean authenticateUser(String username, String password) {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/qlnv", "root", "");
-            String query = "SELECT * FROM tk_dangnhap WHERE User=? AND Password=?";
-            PreparedStatement statement = conn.prepareStatement(query);
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/qlnv", "root", "");
+             PreparedStatement statement = conn.prepareStatement("SELECT * FROM tk_dangnhap WHERE username=? AND password=?")) {
+             
             statement.setString(1, username);
             statement.setString(2, password);
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.next();
-        } catch (Exception e) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }

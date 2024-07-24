@@ -1,8 +1,16 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package QLNV;
 
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * TableModel for NhanVien
+ */
 public class NhanVienTableModel extends AbstractTableModel {
 
     private final ArrayList<NhanVien> dsSinhVien;

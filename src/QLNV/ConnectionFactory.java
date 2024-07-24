@@ -1,6 +1,5 @@
 package QLNV;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,6 +10,7 @@ public class ConnectionFactory {
     String dbUser = "root";
     String dbPwd = "";
     private static ConnectionFactory connectionFactory = null;
+
     private ConnectionFactory() {
         try {
             Class.forName(driverClassName);
@@ -20,23 +20,33 @@ public class ConnectionFactory {
     }
 
     public Connection getConnection() throws SQLException {
-        Connection conn = null;
-        conn = DriverManager.getConnection(connectionUrl, dbUser, dbPwd);
-        return conn;
+        return DriverManager.getConnection(connectionUrl, dbUser, dbPwd);
     }
+
     public static ConnectionFactory getInstance() {
         if (connectionFactory == null) {
             connectionFactory = new ConnectionFactory();
         }
         return connectionFactory;
     }
+
     public static void main(String[] args) {
-        ConnectionFactory cf = new ConnectionFactory();
+        ConnectionFactory cf = ConnectionFactory.getInstance(); // Sử dụng getInstance() thay vì tạo đối tượng mới
+        Connection con = null;
         try {
-            Connection con = cf.getConnection();
+            con = cf.getConnection();
+            // Sử dụng kết nối ở đây
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            // Đảm bảo đóng kết nối để tránh rò rỉ tài nguyên
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
     }
 }
