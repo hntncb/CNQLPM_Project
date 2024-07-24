@@ -1,4 +1,3 @@
-
 package QLNV;
 
 import java.awt.event.ActionEvent;
@@ -13,11 +12,16 @@ public class NhanVienController {
     private final NhanVienImplDAO dao;
     private final NhanVienTableModel nhanVienModel;
     private final NhanVienView nhanVienView;
+    private UserType userType;
 
     public NhanVienController(NhanVienView nhanVienView, NhanVienTableModel nhanVienModel) {
         this.nhanVienView = nhanVienView;
         this.nhanVienModel = nhanVienModel;
         this.dao = new NhanVienImplDAO();
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     public void showNhanVienView() {
@@ -27,6 +31,7 @@ public class NhanVienController {
         nhanVienView.addUpdateNhanVienListener(new UpdateNhanVienListener());
         nhanVienView.addInsertNhanVienListener(new InsertNhanVienListener());
         nhanVienView.addClearNhanVienListener(new ClearNhanVienListener());
+        nhanVienView.setButtonVisibility(userType == UserType.ADMIN); // Thiết lập quyền theo userType
         nhanVienView.setVisible(true);
         nhanVienView.setEnabled(true);
     }

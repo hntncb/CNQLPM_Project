@@ -1,18 +1,12 @@
 package QLNV;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 
 public class DangNhap extends JFrame implements ActionListener {
     private JLabel titleLabel, usernameLabel, passwordLabel;
@@ -58,9 +52,10 @@ public class DangNhap extends JFrame implements ActionListener {
         if (e.getSource() == loginButton) {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
-            if (authenticateUser(username, password)) {
+            UserType userType = authenticateUser(username, password);
+            if (userType != null) {
                 JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
-                handleSuccessfulLogin();
+                handleSuccessfulLogin(userType);
                 this.dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Đăng nhập thất bại. Vui lòng kiểm tra tên đăng nhập và mật khẩu.");
@@ -70,27 +65,31 @@ public class DangNhap extends JFrame implements ActionListener {
         }
     }
     
-    private boolean authenticateUser(String username, String password) {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/qlnv", "root", "");
-             PreparedStatement statement = conn.prepareStatement("SELECT * FROM tk_dangnhap WHERE username=? AND password=?")) {
+    private UserType authenticateUser(String username, String password) {
+        try (Connection conn = ConnectionFactory.getInstance().getConnection();
+             PreparedStatement statement = conn.prepareStatement("SELECT user_type FROM tk_dangnhap WHERE username=? AND password=?")) {
              
             statement.setString(1, username);
             statement.setString(2, password);
             try (ResultSet resultSet = statement.executeQuery()) {
-                return resultSet.next();
+                if (resultSet.next()) {
+                    String userTypeString = resultSet.getString("user_type");
+                    return UserType.valueOf(userTypeString.toUpperCase());
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return null;
     }
 
-    private void handleSuccessfulLogin() {
+    private void handleSuccessfulLogin(UserType userType) {
         try {
-            NhanVienImplDAO sinhVienDAO = new NhanVienImplDAO();
-            NhanVienTableModel sinhvienModel = new NhanVienTableModel(sinhVienDAO.getAll());
-            NhanVienView sinhvienView = new NhanVienView();
-            NhanVienController controller = new NhanVienController(sinhvienView, sinhvienModel);
+            NhanVienImplDAO nhanVienDAO = new NhanVienImplDAO();
+            NhanVienTableModel nhanVienModel = new NhanVienTableModel(nhanVienDAO.getAll());
+            NhanVienView nhanVienView = new NhanVienView();
+            NhanVienController controller = new NhanVienController(nhanVienView, nhanVienModel);
+            controller.setUserType(userType); // Truyền userType để thiết lập quyền
             controller.showNhanVienView();
         } catch (SQLException e) {
             e.printStackTrace();
