@@ -89,7 +89,7 @@ public class DangNhap extends JFrame implements ActionListener {
             NhanVienTableModel nhanVienModel = new NhanVienTableModel(nhanVienDAO.getAll());
             NhanVienView nhanVienView = new NhanVienView();
             NhanVienController controller = new NhanVienController(nhanVienView, nhanVienModel);
-            controller.setUserType(userType); // Truyền userType để thiết lập quyền
+            controller.setUserType(userType);
             controller.showNhanVienView();
         } catch (SQLException e) {
             e.printStackTrace();

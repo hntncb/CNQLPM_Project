@@ -31,7 +31,7 @@ public class NhanVienController {
         nhanVienView.addUpdateNhanVienListener(new UpdateNhanVienListener());
         nhanVienView.addInsertNhanVienListener(new InsertNhanVienListener());
         nhanVienView.addClearNhanVienListener(new ClearNhanVienListener());
-        nhanVienView.setButtonVisibility(userType == UserType.ADMIN); // Thiết lập quyền theo userType
+        nhanVienView.setButtonVisibility(userType == UserType.ADMIN);
         nhanVienView.setVisible(true);
         nhanVienView.setEnabled(true);
     }
