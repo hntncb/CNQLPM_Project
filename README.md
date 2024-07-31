@@ -1,1 +1,1 @@
-Tải 2 file SQL về sau đó import vào MySQL trong Xampp
+Tải file qlvn.sql về sau đó import vào MySQL trong Xampp
