@@ -48,6 +48,7 @@ public class DangNhap extends JFrame implements ActionListener {
         passwordField.addActionListener(e -> loginButton.doClick());
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginButton) {
             String username = usernameField.getText();
@@ -84,15 +85,11 @@ public class DangNhap extends JFrame implements ActionListener {
     }
 
     private void handleSuccessfulLogin(UserType userType) {
-        try {
-            NhanVienImplDAO nhanVienDAO = new NhanVienImplDAO();
-            NhanVienTableModel nhanVienModel = new NhanVienTableModel(nhanVienDAO.getAll());
-            NhanVienView nhanVienView = new NhanVienView();
-            NhanVienController controller = new NhanVienController(nhanVienView, nhanVienModel);
-            controller.setUserType(userType);
-            controller.showNhanVienView();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Mở SubFrame và truyền quyền người dùng vào
+        SwingUtilities.invokeLater(() -> {
+            SubFrame subFrame = new SubFrame(userType);
+            subFrame.setVisible(true);
+        });
     }
+
 }

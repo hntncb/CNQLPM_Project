@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -69,7 +68,7 @@ public class NhanVienView extends JFrame {
         btnXoa = new JButton("Xóa");
         buttonPanel.add(btnXoa);
 
-        btnClear = new JButton("Xóa thông tin");
+        btnClear = new JButton("Clear");
         buttonPanel.add(btnClear);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -138,7 +137,7 @@ public class NhanVienView extends JFrame {
     }
 
     public void setButtonVisibility(boolean isVisible) {
-        btnSua.setVisible(isVisible);
-        btnXoa.setVisible(isVisible);
+        btnSua.setEnabled(isVisible);
+        btnXoa.setEnabled(isVisible);
     }
 }
