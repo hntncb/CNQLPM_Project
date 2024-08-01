@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -12,11 +14,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableRowSorter;
 
 public class NhanVienView extends JFrame {
 
     private JTable table;
+    private TableRowSorter<NhanVienTableModel> rowSorter;
     private JButton btnThem, btnSua, btnXoa, btnClear, btnSearch, btnInsertByFile;
     private JTextField txtID, txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu, txtSearch;
     private NhanVienTableModel model;
@@ -24,7 +29,7 @@ public class NhanVienView extends JFrame {
     public NhanVienView() {
         setTitle("Quản lý nhân viên");
         setBounds(100, 100, 600, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         table = new JTable();
@@ -33,6 +38,9 @@ public class NhanVienView extends JFrame {
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(7, 2)); // Sửa thành 7 hàng
+        
+        rowSorter = new TableRowSorter<>();
+        table.setRowSorter(rowSorter);
 
         panel.add(new JLabel("ID:"));
         txtID = new JTextField();
@@ -91,6 +99,7 @@ public class NhanVienView extends JFrame {
     public void showListNhanVien(NhanVienTableModel model) {
         this.model = model;
         table.setModel(model);
+        rowSorter.setModel(model); // Gán model cho TableRowSorter
     }
 
     public NhanVien getNhanVienInfo() {
@@ -184,6 +193,15 @@ public class NhanVienView extends JFrame {
 
     public void addSearchNhanVienListener(ActionListener listener) {
         btnSearch.addActionListener(listener);
+    }
+    
+    public void showSearchResults(ArrayList<NhanVien> results) {
+        NhanVienTableModel searchModel = new NhanVienTableModel(results);
+        showListNhanVien(searchModel);
+    }
+
+    public String getSearchKeyword() {
+        return txtSearch.getText().trim();
     }
 
     public void showMessage(String message) {

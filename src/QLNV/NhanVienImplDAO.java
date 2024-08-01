@@ -18,9 +18,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-/**
- * Implementation of DAO for NhanVien
- */
 public class NhanVienImplDAO implements DAO {
 
     private final String selectAll = "SELECT * FROM thong_tin_nhan_vien";
@@ -29,7 +26,9 @@ public class NhanVienImplDAO implements DAO {
     private final String sqlDelete = "DELETE FROM thong_tin_nhan_vien WHERE ID = ?";
     private final String sqlFindByID = "SELECT * FROM thong_tin_nhan_vien WHERE ID = ?";
     private final String sqlFindByName = "SELECT * FROM thong_tin_nhan_vien WHERE HoTen = ?";
+    private final String sqlSearch = "SELECT * FROM thong_tin_nhan_vien WHERE ID LIKE ? OR HoTen LIKE ?";
 
+    
     private static void closeConnection(Connection con) {
         if (con != null) {
             try {
@@ -209,6 +208,37 @@ public class NhanVienImplDAO implements DAO {
             closeConnection(con);
         }
         return rowsAffected > 0;
+    }
+    
+    public ArrayList<NhanVien> search(String keyword) throws SQLException {
+        Connection con = getConnection();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        ArrayList<NhanVien> resultList = new ArrayList<>();
+        try {
+            pstmt = con.prepareStatement(sqlSearch);
+            String searchPattern = "%" + keyword + "%"; // Tạo mẫu tìm kiếm với từ khóa
+            pstmt.setString(1, searchPattern);
+            pstmt.setString(2, searchPattern);
+
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                NhanVien nv = new NhanVien(
+                        rs.getInt("ID"),
+                        rs.getString("HoTen"),
+                        rs.getString("NamSinh"),
+                        rs.getString("DiaChi"),
+                        rs.getString("SDT"),
+                        rs.getString("ChucVu")
+                );
+                resultList.add(nv);
+            }
+        } finally {
+            closeResultSet(rs);
+            closeStatement(pstmt);
+            closeConnection(con);
+        }
+        return resultList;
     }
 
     public NhanVien findByID(int id) throws SQLException {

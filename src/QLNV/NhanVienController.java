@@ -50,10 +50,17 @@ public class NhanVienController {
         }
     }
 
-    class ClearNhanVienListener implements ActionListener {
+    class ClearNhanVienListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-            nhanVienView.clearNhanVienInfo();
+//            nhanVienView.clearNhanVienInfo();
+//            nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
+        	try {
+                nhanVienView.clearNhanVienInfo();
+                nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -153,5 +160,7 @@ public class NhanVienController {
             }
         }
     }
+    
+    
 
 }

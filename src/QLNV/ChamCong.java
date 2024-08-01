@@ -29,7 +29,7 @@ public class ChamCong extends JFrame {
     	save_btn = new JButton("Lưu"); 
         setTitle("Quản lý chấm công");
         setSize(1360, 768);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // Tạo JComboBox cho tháng và năm
