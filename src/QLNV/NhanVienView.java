@@ -17,8 +17,8 @@ import javax.swing.event.ListSelectionListener;
 public class NhanVienView extends JFrame {
 
     private JTable table;
-    private JButton btnThem, btnSua, btnXoa, btnClear,btnSearch,btnInsertByFile;
-    private JTextField txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu, txtSearch;
+    private JButton btnThem, btnSua, btnXoa, btnClear, btnSearch, btnInsertByFile;
+    private JTextField txtID, txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu, txtSearch;
     private NhanVienTableModel model;
 
     public NhanVienView() {
@@ -32,7 +32,11 @@ public class NhanVienView extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(6, 2));
+        panel.setLayout(new GridLayout(7, 2)); // Sửa thành 7 hàng
+
+        panel.add(new JLabel("ID:"));
+        txtID = new JTextField();
+        panel.add(txtID);
 
         panel.add(new JLabel("Họ tên:"));
         txtHoTen = new JTextField();
@@ -53,7 +57,8 @@ public class NhanVienView extends JFrame {
         panel.add(new JLabel("Chức vụ:"));
         txtChucVu = new JTextField();
         panel.add(txtChucVu);
-        
+
+        panel.add(new JLabel("Tìm kiếm:")); // Thêm label cho ô tìm kiếm
         txtSearch = new JTextField();
         panel.add(txtSearch);
 
@@ -64,7 +69,7 @@ public class NhanVienView extends JFrame {
 
         btnThem = new JButton("Thêm");
         buttonPanel.add(btnThem);
-        
+
         btnInsertByFile = new JButton("Chèn File");
         buttonPanel.add(btnInsertByFile);
 
@@ -76,10 +81,9 @@ public class NhanVienView extends JFrame {
 
         btnClear = new JButton("Clear");
         buttonPanel.add(btnClear);
-        
-        btnSearch = new JButton("Search");
+
+        btnSearch = new JButton("Tìm kiếm");
         buttonPanel.add(btnSearch);
-        
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -90,26 +94,32 @@ public class NhanVienView extends JFrame {
     }
 
     public NhanVien getNhanVienInfo() {
-        String hoTen = txtHoTen.getText();
-        String namSinh = txtNamSinh.getText();
-        String diaChi = txtDiaChi.getText();
-        String sdt = txtSDT.getText();
-        String chucVu = txtChucVu.getText();
+        try {
+            int id = Integer.parseInt(txtID.getText());
+            String hoTen = txtHoTen.getText();
+            String namSinh = txtNamSinh.getText();
+            String diaChi = txtDiaChi.getText();
+            String sdt = txtSDT.getText();
+            String chucVu = txtChucVu.getText();
 
-        if (hoTen.isEmpty() || namSinh.isEmpty() || diaChi.isEmpty() || sdt.isEmpty() || chucVu.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin.");
+            if (hoTen.isEmpty() || namSinh.isEmpty() || diaChi.isEmpty() || sdt.isEmpty() || chucVu.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin.");
+                return null;
+            }
+            return new NhanVien(id, hoTen, namSinh, diaChi, sdt, chucVu);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "ID phải là một số nguyên.");
             return null;
         }
-        return new NhanVien(hoTen, namSinh, diaChi, sdt, chucVu);
     }
-    
+
     public NhanVien getSearchInfo() {
         String hoTen = txtSearch.getText().trim();
         if (hoTen.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Vui lòng nhập tên nhân viên cần tìm kiếm.");
             return null;
         }
-        
+
         for (int i = 0; i < model.getRowCount(); i++) {
             String currentHoTen = (String) model.getValueAt(i, 1); // Assuming hoTen is in the second column (index 1)
             if (currentHoTen.equalsIgnoreCase(hoTen)) {
@@ -118,7 +128,7 @@ public class NhanVienView extends JFrame {
                 String diaChi = (String) model.getValueAt(i, 3);
                 String sdt = (String) model.getValueAt(i, 4);
                 String chucVu = (String) model.getValueAt(i, 5);
-                
+
                 return new NhanVien(id, currentHoTen, namSinh, diaChi, sdt, chucVu);
             }
         }
@@ -126,25 +136,26 @@ public class NhanVienView extends JFrame {
         return null;
     }
 
-
-
     public void fillNhanVienFromSelectedRow() {
         int row = table.getSelectedRow();
         if (row >= 0) {
-            txtHoTen.setText((String) table.getValueAt(row, 1));
-            txtNamSinh.setText((String) table.getValueAt(row, 2));
-            txtDiaChi.setText((String) table.getValueAt(row, 3));
-            txtSDT.setText((String) table.getValueAt(row, 4));
-            txtChucVu.setText((String) table.getValueAt(row, 5));
+            txtID.setText(String.valueOf(model.getValueAt(row, 0)));
+            txtHoTen.setText((String) model.getValueAt(row, 1));
+            txtNamSinh.setText((String) model.getValueAt(row, 2));
+            txtDiaChi.setText((String) model.getValueAt(row, 3));
+            txtSDT.setText((String) model.getValueAt(row, 4));
+            txtChucVu.setText((String) model.getValueAt(row, 5));
         }
     }
 
     public void clearNhanVienInfo() {
+        txtID.setText("");
         txtHoTen.setText("");
         txtNamSinh.setText("");
         txtDiaChi.setText("");
         txtSDT.setText("");
         txtChucVu.setText("");
+        txtSearch.setText("");
     }
 
     public void addListNhanVienSelectionListener(ListSelectionListener listener) {
@@ -154,11 +165,11 @@ public class NhanVienView extends JFrame {
     public void addInsertNhanVienListener(ActionListener listener) {
         btnThem.addActionListener(listener);
     }
-    
+
     public void addInsertFileNhanVienListener(ActionListener listener) {
         btnInsertByFile.addActionListener(listener);
     }
-    
+
     public void addUpdateNhanVienListener(ActionListener listener) {
         btnSua.addActionListener(listener);
     }
@@ -170,7 +181,7 @@ public class NhanVienView extends JFrame {
     public void addClearNhanVienListener(ActionListener listener) {
         btnClear.addActionListener(listener);
     }
-    
+
     public void addSearchNhanVienListener(ActionListener listener) {
         btnSearch.addActionListener(listener);
     }

@@ -5,10 +5,6 @@
  */
 package QLNV;
 
-/**
- *
- * @author Hoang
- */
 public class NhanVien {
     private int id;
     private String hoTen;
@@ -16,14 +12,6 @@ public class NhanVien {
     private String diaChi;
     private String sdt;
     private String chucVu;
-
-    public NhanVien(String hoTen, String namSinh, String diaChi, String sdt, String chucVu) {
-        this.hoTen = hoTen;
-        this.namSinh = namSinh;
-        this.diaChi = diaChi;
-        this.sdt = sdt;
-        this.chucVu = chucVu;
-    }
 
     public NhanVien() {
         this.id = 0; // Initialize id to a default value
