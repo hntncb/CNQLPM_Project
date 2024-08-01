@@ -2,10 +2,15 @@ package QLNV;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import javax.swing.JFileChooser;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class NhanVienController {
 
@@ -18,6 +23,7 @@ public class NhanVienController {
         this.nhanVienView = nhanVienView;
         this.nhanVienModel = nhanVienModel;
         this.dao = new NhanVienImplDAO();
+        nhanVienView.addInsertFileNhanVienListener(new InsertFileNhanVienListener());
     }
 
     public void setUserType(UserType userType) {
@@ -63,6 +69,26 @@ public class NhanVienController {
                     nhanVienView.showMessage("Thêm thành công!");
                 } catch (SQLException e1) {
                     nhanVienView.showMessage(e1.toString());
+                }
+            }
+        }
+    }
+    
+    class InsertFileNhanVienListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fileChooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV Files", "csv");
+            fileChooser.setFileFilter(filter);
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                try {
+                    dao.insertByFile(selectedFile.getAbsolutePath());
+                    nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
+                    nhanVienView.showMessage("Chèn dữ liệu từ file thành công!");
+                } catch (SQLException | IOException ex) {
+                    nhanVienView.showMessage("Lỗi: " + ex.getMessage());
                 }
             }
         }

@@ -4,9 +4,6 @@ package QLNV;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
-/**
- * TableModel for NhanVien
- */
 public class NhanVienTableModel extends AbstractTableModel {
 
     private final ArrayList<NhanVien> dsNhanVien;

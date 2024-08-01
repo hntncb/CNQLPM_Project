@@ -17,7 +17,7 @@ import javax.swing.event.ListSelectionListener;
 public class NhanVienView extends JFrame {
 
     private JTable table;
-    private JButton btnThem, btnSua, btnXoa, btnClear, btnSearch;
+    private JButton btnThem, btnSua, btnXoa, btnClear,btnSearch,btnInsertByFile;
     private JTextField txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu, txtSearch;
     private NhanVienTableModel model;
 
@@ -64,6 +64,9 @@ public class NhanVienView extends JFrame {
 
         btnThem = new JButton("Thêm");
         buttonPanel.add(btnThem);
+        
+        btnInsertByFile = new JButton("Chèn File");
+        buttonPanel.add(btnInsertByFile);
 
         btnSua = new JButton("Sửa");
         buttonPanel.add(btnSua);
@@ -151,7 +154,11 @@ public class NhanVienView extends JFrame {
     public void addInsertNhanVienListener(ActionListener listener) {
         btnThem.addActionListener(listener);
     }
-
+    
+    public void addInsertFileNhanVienListener(ActionListener listener) {
+        btnInsertByFile.addActionListener(listener);
+    }
+    
     public void addUpdateNhanVienListener(ActionListener listener) {
         btnSua.addActionListener(listener);
     }
@@ -175,5 +182,6 @@ public class NhanVienView extends JFrame {
     public void setButtonVisibility(boolean isVisible) {
         btnSua.setEnabled(isVisible);
         btnXoa.setEnabled(isVisible);
+        btnInsertByFile.setEnabled(isVisible);
     }
 }
