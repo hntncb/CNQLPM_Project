@@ -100,28 +100,29 @@ public class NhanVienView extends JFrame {
         return new NhanVien(hoTen, namSinh, diaChi, sdt, chucVu);
     }
     
-    public String getSearchInfo() {
+    public NhanVien getSearchInfo() {
         String hoTen = txtSearch.getText().trim();
         if (hoTen.isEmpty()) {
-            return "Vui lòng nhập tên nhân viên cần tìm kiếm.";
+            JOptionPane.showMessageDialog(null, "Vui lòng nhập tên nhân viên cần tìm kiếm.");
+            return null;
         }
         
         for (int i = 0; i < model.getRowCount(); i++) {
             String currentHoTen = (String) model.getValueAt(i, 1); // Assuming hoTen is in the second column (index 1)
             if (currentHoTen.equalsIgnoreCase(hoTen)) {
-                // Construct the NhanVien information from the table data
                 int id = (int) model.getValueAt(i, 0);
                 String namSinh = (String) model.getValueAt(i, 2);
                 String diaChi = (String) model.getValueAt(i, 3);
                 String sdt = (String) model.getValueAt(i, 4);
                 String chucVu = (String) model.getValueAt(i, 5);
                 
-                return String.format("ID: %d, Họ tên: %s, Năm sinh: %s, Địa chỉ: %s, SĐT: %s, Chức vụ: %s",
-                                     id, currentHoTen, namSinh, diaChi, sdt, chucVu);
+                return new NhanVien(id, currentHoTen, namSinh, diaChi, sdt, chucVu);
             }
         }
-        return "Không tìm thấy nhân viên với họ tên: " + hoTen;
+        JOptionPane.showMessageDialog(null, "Không tìm thấy nhân viên với họ tên: " + hoTen);
+        return null;
     }
+
 
 
     public void fillNhanVienFromSelectedRow() {

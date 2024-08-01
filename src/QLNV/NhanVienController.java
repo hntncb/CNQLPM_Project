@@ -109,31 +109,23 @@ public class NhanVienController {
     class SearchNhanVienListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String searchResult = nhanVienView.getSearchInfo();
-            if (searchResult.startsWith("ID:")) {
-                // A employee was found
+            NhanVien foundNhanVien = nhanVienView.getSearchInfo();
+            if (foundNhanVien != null) {
+                // Hiển thị thông báo với thông tin nhân viên
+                String searchResult = String.format("ID: %d, Họ tên: %s, Năm sinh: %s, Địa chỉ: %s, SĐT: %s, Chức vụ: %s",
+                        foundNhanVien.getId(), foundNhanVien.getHoTen(), foundNhanVien.getNamSinh(),
+                        foundNhanVien.getDiaChi(), foundNhanVien.getSdt(), foundNhanVien.getChucVu());
                 nhanVienView.showMessage(searchResult);
                 
-                // Extract the employee information from the search result
-                String[] parts = searchResult.split(", ");
-                int id = Integer.parseInt(parts[0].split(": ")[1]);
-                String hoTen = parts[1].split(": ")[1];
-                String namSinh = parts[2].split(": ")[1];
-                String diaChi = parts[3].split(": ")[1];
-                String sdt = parts[4].split(": ")[1];
-                String chucVu = parts[5].split(": ")[1];
-                
-                // Create a NhanVien object with the found information
-                NhanVien foundNhanVien = new NhanVien(id, hoTen, namSinh, diaChi, sdt, chucVu);
-                
-                // Create a new ArrayList with the found NhanVien and update the table
+                // Cập nhật bảng hiển thị với thông tin nhân viên đã tìm thấy
                 ArrayList<NhanVien> searchResults = new ArrayList<>();
                 searchResults.add(foundNhanVien);
                 nhanVienView.showListNhanVien(new NhanVienTableModel(searchResults));
             } else {
-                // No employee was found or there was an error
-                nhanVienView.showMessage(searchResult);
+                // Nhân viên không được tìm thấy hoặc có lỗi
+                // Thông báo đã được hiển thị trong phương thức getSearchInfo
             }
         }
     }
+
 }
