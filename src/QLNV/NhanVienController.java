@@ -31,6 +31,7 @@ public class NhanVienController {
         nhanVienView.addUpdateNhanVienListener(new UpdateNhanVienListener());
         nhanVienView.addInsertNhanVienListener(new InsertNhanVienListener());
         nhanVienView.addClearNhanVienListener(new ClearNhanVienListener());
+        nhanVienView.addSearchNhanVienListener(new SearchNhanVienListener());
         nhanVienView.setButtonVisibility(userType == UserType.ADMIN);
         nhanVienView.setVisible(true);
         nhanVienView.setEnabled(true);
@@ -101,6 +102,37 @@ public class NhanVienController {
                 } catch (SQLException e1) {
                     nhanVienView.showMessage(e1.toString());
                 }
+            }
+        }
+    }
+    
+    class SearchNhanVienListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String searchResult = nhanVienView.getSearchInfo();
+            if (searchResult.startsWith("ID:")) {
+                // A employee was found
+                nhanVienView.showMessage(searchResult);
+                
+                // Extract the employee information from the search result
+                String[] parts = searchResult.split(", ");
+                int id = Integer.parseInt(parts[0].split(": ")[1]);
+                String hoTen = parts[1].split(": ")[1];
+                String namSinh = parts[2].split(": ")[1];
+                String diaChi = parts[3].split(": ")[1];
+                String sdt = parts[4].split(": ")[1];
+                String chucVu = parts[5].split(": ")[1];
+                
+                // Create a NhanVien object with the found information
+                NhanVien foundNhanVien = new NhanVien(id, hoTen, namSinh, diaChi, sdt, chucVu);
+                
+                // Create a new ArrayList with the found NhanVien and update the table
+                ArrayList<NhanVien> searchResults = new ArrayList<>();
+                searchResults.add(foundNhanVien);
+                nhanVienView.showListNhanVien(new NhanVienTableModel(searchResults));
+            } else {
+                // No employee was found or there was an error
+                nhanVienView.showMessage(searchResult);
             }
         }
     }

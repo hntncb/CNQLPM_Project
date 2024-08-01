@@ -17,8 +17,8 @@ import javax.swing.event.ListSelectionListener;
 public class NhanVienView extends JFrame {
 
     private JTable table;
-    private JButton btnThem, btnSua, btnXoa, btnClear;
-    private JTextField txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu;
+    private JButton btnThem, btnSua, btnXoa, btnClear, btnSearch;
+    private JTextField txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu, txtSearch;
     private NhanVienTableModel model;
 
     public NhanVienView() {
@@ -53,6 +53,9 @@ public class NhanVienView extends JFrame {
         panel.add(new JLabel("Chức vụ:"));
         txtChucVu = new JTextField();
         panel.add(txtChucVu);
+        
+        txtSearch = new JTextField();
+        panel.add(txtSearch);
 
         add(panel, BorderLayout.NORTH);
 
@@ -70,6 +73,10 @@ public class NhanVienView extends JFrame {
 
         btnClear = new JButton("Clear");
         buttonPanel.add(btnClear);
+        
+        btnSearch = new JButton("Search");
+        buttonPanel.add(btnSearch);
+        
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -92,6 +99,30 @@ public class NhanVienView extends JFrame {
         }
         return new NhanVien(hoTen, namSinh, diaChi, sdt, chucVu);
     }
+    
+    public String getSearchInfo() {
+        String hoTen = txtSearch.getText().trim();
+        if (hoTen.isEmpty()) {
+            return "Vui lòng nhập tên nhân viên cần tìm kiếm.";
+        }
+        
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String currentHoTen = (String) model.getValueAt(i, 1); // Assuming hoTen is in the second column (index 1)
+            if (currentHoTen.equalsIgnoreCase(hoTen)) {
+                // Construct the NhanVien information from the table data
+                int id = (int) model.getValueAt(i, 0);
+                String namSinh = (String) model.getValueAt(i, 2);
+                String diaChi = (String) model.getValueAt(i, 3);
+                String sdt = (String) model.getValueAt(i, 4);
+                String chucVu = (String) model.getValueAt(i, 5);
+                
+                return String.format("ID: %d, Họ tên: %s, Năm sinh: %s, Địa chỉ: %s, SĐT: %s, Chức vụ: %s",
+                                     id, currentHoTen, namSinh, diaChi, sdt, chucVu);
+            }
+        }
+        return "Không tìm thấy nhân viên với họ tên: " + hoTen;
+    }
+
 
     public void fillNhanVienFromSelectedRow() {
         int row = table.getSelectedRow();
@@ -130,6 +161,10 @@ public class NhanVienView extends JFrame {
 
     public void addClearNhanVienListener(ActionListener listener) {
         btnClear.addActionListener(listener);
+    }
+    
+    public void addSearchNhanVienListener(ActionListener listener) {
+        btnSearch.addActionListener(listener);
     }
 
     public void showMessage(String message) {

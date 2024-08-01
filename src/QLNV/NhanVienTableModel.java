@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package QLNV;
 
 import java.util.ArrayList;
@@ -13,16 +9,16 @@ import javax.swing.table.AbstractTableModel;
  */
 public class NhanVienTableModel extends AbstractTableModel {
 
-    private final ArrayList<NhanVien> dsSinhVien;
+    private final ArrayList<NhanVien> dsNhanVien;
     private final Object[][] data;
     private final String[] columnNames = {"ID", "HoTen", "NamSinh", "DiaChi", "SDT", "ChucVu"};
 
-    public NhanVienTableModel(ArrayList<NhanVien> dsSinhVien) {
-        this.dsSinhVien = dsSinhVien;
-        this.data = new Object[dsSinhVien.size()][columnNames.length];
+    public NhanVienTableModel(ArrayList<NhanVien> dsNhanVien) {
+        this.dsNhanVien = dsNhanVien;
+        this.data = new Object[dsNhanVien.size()][columnNames.length];
 
-        for (int i = 0; i < dsSinhVien.size(); i++) {
-            NhanVien sv = dsSinhVien.get(i);
+        for (int i = 0; i < dsNhanVien.size(); i++) {
+            NhanVien sv = dsNhanVien.get(i);
             data[i] = new Object[]{sv.getId(), sv.getHoTen(), sv.getNamSinh(), sv.getDiaChi(), sv.getSdt(), sv.getChucVu()};
         }
     }
