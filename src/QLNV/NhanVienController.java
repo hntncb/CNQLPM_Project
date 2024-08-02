@@ -142,25 +142,17 @@ public class NhanVienController {
     class SearchNhanVienListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            NhanVien foundNhanVien = nhanVienView.getSearchInfo();
-            if (foundNhanVien != null) {
-                // Hiển thị thông báo với thông tin nhân viên
-                String searchResult = String.format("ID: %d, Họ tên: %s, Năm sinh: %s, Địa chỉ: %s, SĐT: %s, Chức vụ: %s",
-                        foundNhanVien.getId(), foundNhanVien.getHoTen(), foundNhanVien.getNamSinh(),
-                        foundNhanVien.getDiaChi(), foundNhanVien.getSdt(), foundNhanVien.getChucVu());
-                nhanVienView.showMessage(searchResult);
-                
-                // Cập nhật bảng hiển thị với thông tin nhân viên đã tìm thấy
-                ArrayList<NhanVien> searchResults = new ArrayList<>();
-                searchResults.add(foundNhanVien);
-                nhanVienView.showListNhanVien(new NhanVienTableModel(searchResults));
-            } else {
-                // Nhân viên không được tìm thấy hoặc có lỗi
-                // Thông báo đã được hiển thị trong phương thức getSearchInfo
+            String keyword = nhanVienView.getSearchKeyword(); // Lấy từ khóa tìm kiếm từ View
+            try {
+                ArrayList<NhanVien> searchResults = dao.search(keyword); // Tìm kiếm nhiều nhân viên
+                if (searchResults.isEmpty()) {
+                    nhanVienView.showMessage("Không tìm thấy kết quả.");
+                } else {
+                    nhanVienView.showListNhanVien(new NhanVienTableModel(searchResults)); // Hiển thị kết quả tìm kiếm
+                }
+            } catch (SQLException ex) {
+                nhanVienView.showMessage("Lỗi: " + ex.getMessage());
             }
         }
     }
-    
-    
-
 }

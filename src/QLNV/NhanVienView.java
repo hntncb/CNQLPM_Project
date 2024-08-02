@@ -122,29 +122,6 @@ public class NhanVienView extends JFrame {
         }
     }
 
-    public NhanVien getSearchInfo() {
-        String hoTen = txtSearch.getText().trim();
-        if (hoTen.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Vui lòng nhập tên nhân viên cần tìm kiếm.");
-            return null;
-        }
-
-        for (int i = 0; i < model.getRowCount(); i++) {
-            String currentHoTen = (String) model.getValueAt(i, 1); // Assuming hoTen is in the second column (index 1)
-            if (currentHoTen.equalsIgnoreCase(hoTen)) {
-                int id = (int) model.getValueAt(i, 0);
-                String namSinh = (String) model.getValueAt(i, 2);
-                String diaChi = (String) model.getValueAt(i, 3);
-                String sdt = (String) model.getValueAt(i, 4);
-                String chucVu = (String) model.getValueAt(i, 5);
-
-                return new NhanVien(id, currentHoTen, namSinh, diaChi, sdt, chucVu);
-            }
-        }
-        JOptionPane.showMessageDialog(null, "Không tìm thấy nhân viên với họ tên: " + hoTen);
-        return null;
-    }
-
     public void fillNhanVienFromSelectedRow() {
         int row = table.getSelectedRow();
         if (row >= 0) {
@@ -207,7 +184,7 @@ public class NhanVienView extends JFrame {
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
-
+    
     public void setButtonVisibility(boolean isVisible) {
         btnSua.setEnabled(isVisible);
         btnXoa.setEnabled(isVisible);

@@ -24,8 +24,6 @@ public class NhanVienImplDAO implements DAO {
     private final String sqlInsert = "INSERT INTO thong_tin_nhan_vien (ID, HoTen, NamSinh, DiaChi, SDT, ChucVu) VALUES (?, ?, ?, ?, ?, ?)";
     private final String sqlUpdate = "UPDATE thong_tin_nhan_vien SET HoTen = ?, NamSinh = ?, DiaChi = ?, SDT = ?, ChucVu = ? WHERE ID = ?";
     private final String sqlDelete = "DELETE FROM thong_tin_nhan_vien WHERE ID = ?";
-    private final String sqlFindByID = "SELECT * FROM thong_tin_nhan_vien WHERE ID = ?";
-    private final String sqlFindByName = "SELECT * FROM thong_tin_nhan_vien WHERE HoTen = ?";
     private final String sqlSearch = "SELECT * FROM thong_tin_nhan_vien WHERE ID LIKE ? OR HoTen LIKE ?";
 
     
@@ -241,64 +239,11 @@ public class NhanVienImplDAO implements DAO {
         return resultList;
     }
 
-    public NhanVien findByID(int id) throws SQLException {
-        Connection con = getConnection();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        NhanVien nv = null;
-        try {
-            stmt = con.prepareStatement(sqlFindByID);
-            stmt.setInt(1, id);
-            rs = stmt.executeQuery();
-            if (rs.next()) {
-                nv = new NhanVien(
-                        rs.getInt("ID"), 
-                        rs.getString("HoTen"), 
-                        rs.getString("NamSinh"), 
-                        rs.getString("DiaChi"), 
-                        rs.getString("SDT"), 
-                        rs.getString("ChucVu")
-                );
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(stmt);
-            closeConnection(con);
-        }
-        return nv;
-    }
-
-    public NhanVien findByName(String name) throws SQLException {
-        Connection con = getConnection();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        NhanVien nv = null;
-        try {
-            stmt = con.prepareStatement(sqlFindByName);
-            stmt.setString(1, name);
-            rs = stmt.executeQuery();
-            if (rs.next()) {
-                nv = new NhanVien(
-                        rs.getInt("ID"), 
-                        rs.getString("HoTen"), 
-                        rs.getString("NamSinh"), 
-                        rs.getString("DiaChi"), 
-                        rs.getString("SDT"), 
-                        rs.getString("ChucVu")
-                );
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(stmt);
-            closeConnection(con);
-        }
-        return nv;
-    }
-
     public void showData() throws SQLException {
         ArrayList<NhanVien> listNhanVien = getAll();
         for (NhanVien nv : listNhanVien) {
             System.out.println(nv.toString());
         }
     }
+
 }
