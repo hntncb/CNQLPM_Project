@@ -28,7 +28,7 @@ public class NhanVienView extends JFrame {
 
     public NhanVienView() {
         setTitle("Quản lý nhân viên");
-        setBounds(100, 100, 600, 400);
+        setSize(1300, 750);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 

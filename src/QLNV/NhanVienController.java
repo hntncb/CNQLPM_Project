@@ -53,8 +53,6 @@ public class NhanVienController {
     class ClearNhanVienListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-//            nhanVienView.clearNhanVienInfo();
-//            nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
         	try {
                 nhanVienView.clearNhanVienInfo();
                 nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));

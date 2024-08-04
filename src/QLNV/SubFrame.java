@@ -3,6 +3,8 @@ package QLNV;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 
 public class SubFrame extends JFrame {
@@ -15,19 +17,20 @@ public class SubFrame extends JFrame {
         // Cài đặt tiêu đề và kích thước cho JFrame
         setTitle("Ứng dụng Quản lý Nhân viên");
         setSize(300, 200);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // Tạo các nút
         JButton btnThongTinNhanVien = new JButton("Thông tin nhân viên");
         JButton btnChamCong = new JButton("Chấm công");
+        JButton btnDangXuat = new JButton("Đăng xuất");
 
         // Cài đặt ActionListener cho nút "Thông tin nhân viên"
         btnThongTinNhanVien.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Hiển thị thông tin nhân viên
-            	try {
+                try {
                     NhanVienImplDAO nhanVienDAO = new NhanVienImplDAO();
                     NhanVienTableModel nhanVienModel = new NhanVienTableModel(nhanVienDAO.getAll());
                     NhanVienView nhanVienView = new NhanVienView();
@@ -49,10 +52,22 @@ public class SubFrame extends JFrame {
             }
         });
 
+        // Cài đặt ActionListener cho nút "Đăng xuất"
+        btnDangXuat.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Đóng cửa sổ hiện tại và mở cửa sổ đăng nhập
+                dispose();
+                DangNhap dangNhap = new DangNhap();
+                dangNhap.setVisible(true);
+            }
+        });
+
         // Tạo một panel để chứa các nút
         JPanel panel = new JPanel();
         panel.add(btnThongTinNhanVien);
         panel.add(btnChamCong);
+        panel.add(btnDangXuat);
 
         // Điều chỉnh các nút dựa trên quyền người dùng
 
@@ -61,5 +76,22 @@ public class SubFrame extends JFrame {
 
         // Hiển thị JFrame
         setVisible(true);
+
+        // Thêm WindowListener để hiển thị hộp thoại xác nhận khi đóng cửa sổ
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int option = JOptionPane.showConfirmDialog(
+                        SubFrame.this,
+                        "Bạn có chắc chắn muốn thoát không?",
+                        "Xác nhận thoát",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (option == JOptionPane.YES_OPTION) {
+                    dispose();
+                }
+            }
+        });
     }
 }
