@@ -102,21 +102,31 @@ public class NhanVienController {
     class DeleteNhanVienListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            NhanVien nv = nhanVienView.getNhanVienInfo();
-            if (nv != null) {
-                try {
-                    dao.delete(nv);
-                    nhanVienView.clearNhanVienInfo();
-                    ArrayList<NhanVien> ds = dao.getAll();
-                    if (ds != null) {
-                        nhanVienView.showListNhanVien(new NhanVienTableModel(ds));
-                    } else {
-                        nhanVienView.showMessage("Dữ liệu rỗng");
+            try {
+                if (nhanVienModel.isShowSelectColumn()) {
+                    // Nếu cột "Chọn" được hiển thị, xóa các hàng đã chọn
+                    nhanVienModel.removeSelectedRows();
+                    nhanVienView.showMessage("Xóa các hàng đã chọn thành công!");
+                } else {
+                    // Nếu không có cột "Chọn", xóa hàng hiện tại
+                    NhanVien nv = nhanVienView.getNhanVienInfo();
+                    if (nv != null) {
+                        dao.delete(nv);
+                        nhanVienView.clearNhanVienInfo();
+                        ArrayList<NhanVien> ds = dao.getAll();
+                        if (ds != null) {
+                            nhanVienView.showListNhanVien(new NhanVienTableModel(ds));
+                        } else {
+                            nhanVienView.showMessage("Dữ liệu rỗng");
+                        }
+                        nhanVienView.showMessage("Xóa thành công!");
                     }
-                    nhanVienView.showMessage("Xóa thành công!");
-                } catch (SQLException e1) {
-                    nhanVienView.showMessage(e1.toString());
                 }
+                nhanVienView.clearNhanVienInfo();
+                nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
+            } catch (SQLException e1) {
+                nhanVienView.showMessage("Đã xảy ra lỗi khi xóa: " + e1.getMessage());
+                e1.printStackTrace();
             }
         }
     }

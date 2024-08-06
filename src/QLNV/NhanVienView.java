@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,10 +24,10 @@ public class NhanVienView extends JFrame {
 
 	private JTable table;
 	private TableRowSorter<NhanVienTableModel> rowSorter;
-	private JButton btnThem, btnSua, btnXoa, btnClear, btnSearch, btnInsertByFile,btnSelectColumn;
+	private JButton btnThem, btnSua, btnXoa, btnClear, btnSearch, btnInsertByFile, btnSelectColumn;
 	private JTextField txtID, txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu, txtSearch;
 	private NhanVienTableModel model;
-	
+
 	public NhanVienView() {
 		setTitle("Quản lý nhân viên");
 		setSize(1300, 750);
@@ -80,12 +79,6 @@ public class NhanVienView extends JFrame {
 
 		btnThem = new JButton("Thêm");
 		buttonPanel.add(btnThem);
-		
-		btnSelectColumn = new JButton("Chọn nhiều");
-        buttonPanel.add(btnSelectColumn);
-
-		btnInsertByFile = new JButton("Chèn File");
-		buttonPanel.add(btnInsertByFile);
 
 		btnSua = new JButton("Sửa");
 		buttonPanel.add(btnSua);
@@ -99,74 +92,81 @@ public class NhanVienView extends JFrame {
 		btnSearch = new JButton("Tìm kiếm");
 		buttonPanel.add(btnSearch);
 		
+		btnSelectColumn = new JButton("Chọn nhiều");
+		buttonPanel.add(btnSelectColumn);
+
+		btnInsertByFile = new JButton("Chèn File");
+		buttonPanel.add(btnInsertByFile);
+
 		btnSelectColumn.addActionListener(e -> toggleSelectColumn());
-		
+
 		ListSelectionModel select = table.getSelectionModel();
 		select.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		select.addListSelectionListener(new ListSelectionListener() {
-		    public void valueChanged(ListSelectionEvent e) {
-		        handleTableSelectionChanged(e);
-		    }
+			public void valueChanged(ListSelectionEvent e) {
+				handleTableSelectionChanged(e);
+			}
 		});
 
 		add(buttonPanel, BorderLayout.SOUTH);
 	}
+
 	private void toggleSelectColumn() {
-	    if (model != null) {
-	        model.toggleSelectColumn(); // Đảo trạng thái cột chọn trong model
-	        setTableColumnWidths(); // Cập nhật kích thước cột
-	    }
+		if (model != null) {
+			model.toggleSelectColumn(); // Đảo trạng thái cột chọn trong model
+			setTableColumnWidths(); // Cập nhật kích thước cột
+		}
 	}
 
 	public void showListNhanVien(NhanVienTableModel model) {
-	    this.model = model;
-	    table.setModel(model);
-	    rowSorter.setModel(model); // Gán model cho TableRowSorter
-	    setTableColumnWidths(); // Cài đặt kích thước cột
+		this.model = model;
+		table.setModel(model);
+		rowSorter.setModel(model); // Gán model cho TableRowSorter
+		setTableColumnWidths(); // Cài đặt kích thước cột
 	}
+
 	private void handleTableSelectionChanged(ListSelectionEvent e) {
-	    if (!e.getValueIsAdjusting()) {
-	        int row = table.getSelectedRow();
-	        int column = table.getSelectedColumn();
-	        if (row != -1 && column == 6) {
-	            Object currentData = table.getValueAt(row, column);
-	            if (currentData instanceof Boolean) {
-	                boolean isTrue = (Boolean) currentData;
-	                table.setValueAt(!isTrue, row, 6);
-	            } else if (currentData instanceof String) {
-	                boolean isTrue = Boolean.parseBoolean((String) currentData);
-	                table.setValueAt(!isTrue, row, 6);
-	            }
-	        }
-	    }
+		if (!e.getValueIsAdjusting()) {
+			int row = table.getSelectedRow();
+			int column = table.getSelectedColumn();
+			if (row != -1 && column == 6) {
+				Object currentData = table.getValueAt(row, column);
+				if (currentData instanceof Boolean) {
+					boolean isTrue = (Boolean) currentData;
+					table.setValueAt(!isTrue, row, 6);
+				} else if (currentData instanceof String) {
+					boolean isTrue = Boolean.parseBoolean((String) currentData);
+					table.setValueAt(!isTrue, row, 6);
+				}
+			}
+		}
 	}
+
 	public void setTableColumnWidths() {
-	    TableColumnModel columnModel = table.getColumnModel();
-	    int columnCount = columnModel.getColumnCount();
+		TableColumnModel columnModel = table.getColumnModel();
+		int columnCount = columnModel.getColumnCount();
 
-	    // Cài đặt kích thước cho các cột khác
-	    columnModel.getColumn(0).setPreferredWidth(50); // Cột ID
-	    columnModel.getColumn(1).setPreferredWidth(150); // Cột Họ tên
-	    columnModel.getColumn(2).setPreferredWidth(100); // Cột Năm sinh
-	    columnModel.getColumn(3).setPreferredWidth(300); // Cột Địa chỉ
-	    columnModel.getColumn(4).setPreferredWidth(100); // Cột SĐT
-	    columnModel.getColumn(5).setPreferredWidth(150); // Cột Chức vụ
+		// Cài đặt kích thước cho các cột khác
+		columnModel.getColumn(0).setPreferredWidth(50); // Cột ID
+		columnModel.getColumn(1).setPreferredWidth(150); // Cột Họ tên
+		columnModel.getColumn(2).setPreferredWidth(100); // Cột Năm sinh
+		columnModel.getColumn(3).setPreferredWidth(300); // Cột Địa chỉ
+		columnModel.getColumn(4).setPreferredWidth(100); // Cột SĐT
+		columnModel.getColumn(5).setPreferredWidth(150); // Cột Chức vụ
 
-	    // Xử lý kích thước cột "Chọn"
-	    if (model != null && model.isShowSelectColumn()) {
-	        if (columnCount > 6) {
-	            columnModel.getColumn(6).setPreferredWidth(50); // Kích thước cột "Chọn" khi hiện
-	            columnModel.getColumn(6).setMinWidth(50); // Đặt kích thước tối thiểu
-	            columnModel.getColumn(6).setMaxWidth(50); // Đặt kích thước tối đa
-	        }
-	    } else if (columnCount > 6) {
-	        columnModel.getColumn(6).setMinWidth(0);
-	        columnModel.getColumn(6).setMaxWidth(0); // Ẩn cột "Chọn"
-	    }
+		// Xử lý kích thước cột "Chọn"
+		if (model != null && model.isShowSelectColumn()) {
+			if (columnCount > 6) {
+				columnModel.getColumn(6).setPreferredWidth(50); // Kích thước cột "Chọn" khi hiện
+				columnModel.getColumn(6).setMinWidth(50); // Đặt kích thước tối thiểu
+				columnModel.getColumn(6).setMaxWidth(50); // Đặt kích thước tối đa
+			}
+		} else if (columnCount > 6) {
+			columnModel.getColumn(6).setMinWidth(0);
+			columnModel.getColumn(6).setMaxWidth(0); // Ẩn cột "Chọn"
+		}
 	}
 
-
-	
 	public NhanVien getNhanVienInfo() {
 		try {
 			int id = Integer.parseInt(txtID.getText());
@@ -226,17 +226,7 @@ public class NhanVienView extends JFrame {
 	}
 
 	public void addDeleteNhanVienListener(ActionListener listener) {
-	    btnXoa.addActionListener(e -> {
-	        if (model.isShowSelectColumn()) {
-	            model.removeSelectedRows(); // Xóa các hàng được chọn
-	        } else {
-	            // Sử dụng phương thức xóa hiện tại (có thể là xóa hàng đã chọn)
-	            int selectedRow = table.getSelectedRow();
-	            if (selectedRow >= 0) {
-	                model.removeRow(selectedRow); // Xóa hàng được chọn
-	            }
-	        }
-	    });
+		btnXoa.addActionListener(listener);
 	}
 
 	public void addClearNhanVienListener(ActionListener listener) {
@@ -265,23 +255,24 @@ public class NhanVienView extends JFrame {
 		btnXoa.setEnabled(isVisible);
 		btnInsertByFile.setEnabled(isVisible);
 	}
+
 	private void deleteSelectedRows() {
-	    if (model != null && model.isShowSelectColumn()) {
-	        // Xóa các hàng có giá trị true ở cột 6
-	        int rowCount = table.getRowCount();
-	        for (int i = rowCount - 1; i >= 0; i--) {
-	            Boolean isSelected = (Boolean) table.getValueAt(i, 6);
-	            if (isSelected != null && isSelected) {
-	                model.removeRow(i);
-	            }
-	        }
-	    } else {
-	        // Thực hiện xóa hàng đã chọn như trước
-	        int selectedRow = table.getSelectedRow();
-	        if (selectedRow != -1) {
-	            model.removeRow(selectedRow);
-	        }
-	    }
+		if (model != null && model.isShowSelectColumn()) {
+			// Xóa các hàng có giá trị true ở cột 6
+			int rowCount = table.getRowCount();
+			for (int i = rowCount - 1; i >= 0; i--) {
+				Boolean isSelected = (Boolean) table.getValueAt(i, 6);
+				if (isSelected != null && isSelected) {
+					model.removeRow(i);
+				}
+			}
+		} else {
+			// Thực hiện xóa hàng đã chọn như trước
+			int selectedRow = table.getSelectedRow();
+			if (selectedRow != -1) {
+				model.removeRow(selectedRow);
+			}
+		}
 	}
 
 }

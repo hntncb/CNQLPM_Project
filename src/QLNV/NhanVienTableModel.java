@@ -1,11 +1,12 @@
 package QLNV;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
 public class NhanVienTableModel extends AbstractTableModel {
-
+	private final NhanVienImplDAO dao;
     private final ArrayList<NhanVien> dsNhanVien;
     private Object[][] data;
     private final String[] columnNames = {"ID", "HoTen", "NamSinh", "DiaChi", "SDT", "ChucVu", "Chọn"};
@@ -13,6 +14,7 @@ public class NhanVienTableModel extends AbstractTableModel {
 
     public NhanVienTableModel(ArrayList<NhanVien> dsNhanVien) {
         this.dsNhanVien = dsNhanVien;
+        this.dao = new NhanVienImplDAO();
         this.data = new Object[dsNhanVien.size()][columnNames.length];
 
         for (int i = 0; i < dsNhanVien.size(); i++) {
@@ -75,21 +77,32 @@ public class NhanVienTableModel extends AbstractTableModel {
         showSelectColumn = !showSelectColumn;
         fireTableStructureChanged(); // Cập nhật cấu trúc bảng
     }
-    public void removeSelectedRows() {
+    public void removeSelectedRows(){
         // Tạo danh sách các chỉ số hàng cần xóa
         ArrayList<Integer> rowsToRemove = new ArrayList<>();
-
+        
         // Tìm các hàng có giá trị true ở cột "Chọn"
         for (int i = 0; i < data.length; i++) {
             if (showSelectColumn && (Boolean) data[i][6]) {
                 rowsToRemove.add(i);
+                System.out.println("Đã xóa nhân viên số:"+rowsToRemove);
             }
         }
-
         // Xóa các hàng từ cuối đến đầu để không làm xáo trộn chỉ số
         for (int i = rowsToRemove.size() - 1; i >= 0; i--) {
             int rowIndex = rowsToRemove.get(i);
-            dsNhanVien.remove(rowIndex); // Xóa khỏi danh sách nhân viên
+            
+            NhanVien nv = dsNhanVien.get(rowIndex);
+
+            // Xóa khỏi cơ sở dữ liệu
+            try {
+				dao.delete(nv);
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // Giả sử phương thức delete của dao nhận đối tượng NhanVien
+
             // Cập nhật dữ liệu của bảng
             Object[][] newData = new Object[dsNhanVien.size()][columnNames.length];
             for (int j = 0; j < dsNhanVien.size(); j++) {
@@ -98,7 +111,7 @@ public class NhanVienTableModel extends AbstractTableModel {
             }
             data = newData;
         }
-        
+
         fireTableDataChanged(); // Cập nhật bảng
     }
 

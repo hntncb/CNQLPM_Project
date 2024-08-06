@@ -1,6 +1,7 @@
 package QLNV;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -16,7 +17,7 @@ public class SubFrame extends JFrame {
 
         // Cài đặt tiêu đề và kích thước cho JFrame
         setTitle("Ứng dụng Quản lý Nhân viên");
-        setSize(300, 200);
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -63,13 +64,13 @@ public class SubFrame extends JFrame {
             }
         });
 
-        // Tạo một panel để chứa các nút
+        // Tạo một panel với LayoutManager để chứa các nút
         JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(3, 1, 10, 10)); // GridLayout với 3 hàng, 1 cột
+
         panel.add(btnThongTinNhanVien);
         panel.add(btnChamCong);
         panel.add(btnDangXuat);
-
-        // Điều chỉnh các nút dựa trên quyền người dùng
 
         // Thêm panel vào JFrame
         add(panel);

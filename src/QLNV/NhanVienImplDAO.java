@@ -26,7 +26,6 @@ public class NhanVienImplDAO implements DAO {
     private final String sqlDelete = "DELETE FROM thong_tin_nhan_vien WHERE ID = ?";
     private final String sqlSearch = "SELECT * FROM thong_tin_nhan_vien WHERE ID LIKE ? OR HoTen LIKE ?";
 
-    
     private static void closeConnection(Connection con) {
         if (con != null) {
             try {
