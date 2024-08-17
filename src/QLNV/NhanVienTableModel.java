@@ -1,133 +1,114 @@
 package QLNV;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 public class NhanVienTableModel extends AbstractTableModel {
-	private final NhanVienImplDAO dao;
-    private final ArrayList<NhanVien> dsNhanVien;
-    private Object[][] data;
+    private ArrayList<NhanVien> dsNhanVien;
+    private ArrayList<Boolean> selectionState;
     private final String[] columnNames = {"ID", "HoTen", "NamSinh", "DiaChi", "SDT", "ChucVu", "Chọn"};
-    private boolean showSelectColumn = false; // Biến điều khiển cột "Chọn"
 
     public NhanVienTableModel(ArrayList<NhanVien> dsNhanVien) {
-        this.dsNhanVien = dsNhanVien;
-        this.dao = new NhanVienImplDAO();
-        this.data = new Object[dsNhanVien.size()][columnNames.length];
-
-        for (int i = 0; i < dsNhanVien.size(); i++) {
-            NhanVien sv = dsNhanVien.get(i);
-            data[i] = new Object[]{sv.getId(), sv.getHoTen(), sv.getNamSinh(), sv.getDiaChi(), sv.getSdt(), sv.getChucVu(), false};
-        }
+        this.dsNhanVien = new ArrayList<>(dsNhanVien);
+        this.selectionState = new ArrayList<>(Collections.nCopies(dsNhanVien.size(), false));
     }
 
     @Override
     public int getRowCount() {
-        return data.length;
+        return dsNhanVien.size();
     }
 
     @Override
     public int getColumnCount() {
-        return showSelectColumn ? columnNames.length : columnNames.length - 1;
+        return columnNames.length;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (rowIndex >= data.length || columnIndex >= getColumnCount()) {
-            throw new IndexOutOfBoundsException("Invalid row or column index");
+        NhanVien nv = dsNhanVien.get(rowIndex);
+        if (columnIndex == 6) {
+            return selectionState.get(rowIndex);
         }
-        if (!showSelectColumn && columnIndex >= 6) {
-            columnIndex++; // Điều chỉnh chỉ số cột nếu cột chọn không hiển thị
-        }
-        return data[rowIndex][columnIndex];
+        return getValueForColumn(nv, columnIndex);
+    }
+
+    private Object getValueForColumn(NhanVien nv, int columnIndex) {
+        if (columnIndex == 0) return nv.getId();
+        if (columnIndex == 1) return nv.getHoTen();
+        if (columnIndex == 2) return nv.getNamSinh();
+        if (columnIndex == 3) return nv.getDiaChi();
+        if (columnIndex == 4) return nv.getSdt();
+        if (columnIndex == 5) return nv.getChucVu();
+        return null;
     }
 
     @Override
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        if (rowIndex >= data.length || columnIndex >= getColumnCount()) {
-            throw new IndexOutOfBoundsException("Invalid row or column index");
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        NhanVien nv = dsNhanVien.get(rowIndex);
+        if (columnIndex == 6) {
+            selectionState.set(rowIndex, (Boolean) value);
+        } else {
+            setValueForColumn(nv, columnIndex, value);
         }
-        if (!showSelectColumn && columnIndex >= 6) {
-            columnIndex++; // Điều chỉnh chỉ số cột nếu cột chọn không hiển thị
-        }
-        data[rowIndex][columnIndex] = aValue;
         fireTableCellUpdated(rowIndex, columnIndex);
     }
 
+    private void setValueForColumn(NhanVien nv, int columnIndex, Object value) {
+        if (columnIndex == 0) nv.setId((Integer) value);
+        if (columnIndex == 1) nv.setHoTen((String) value);
+        if (columnIndex == 2) nv.setNamSinh((String) value);
+        if (columnIndex == 3) nv.setDiaChi((String) value);
+        if (columnIndex == 4) nv.setSdt((String) value);
+        if (columnIndex == 5) nv.setChucVu((String) value);
+    }
+
     @Override
-    public String getColumnName(int column) {
-        return column < 6 || showSelectColumn ? columnNames[column] : columnNames[column + 1];
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 6;
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (showSelectColumn && columnIndex == 6) { // Cột "Chọn" ở chỉ số 6
+        if (columnIndex == 6) {
             return Boolean.class;
         }
-        return Object.class;
+        return super.getColumnClass(columnIndex);
     }
 
-    public boolean isShowSelectColumn() {
-        return showSelectColumn;
+    @Override
+    public String getColumnName(int column) {
+        return columnNames[column];
     }
 
-    public void toggleSelectColumn() {
-        showSelectColumn = !showSelectColumn;
-        fireTableStructureChanged(); // Cập nhật cấu trúc bảng
-    }
-    public void removeSelectedRows(){
-        // Tạo danh sách các chỉ số hàng cần xóa
-        ArrayList<Integer> rowsToRemove = new ArrayList<>();
-        
-        // Tìm các hàng có giá trị true ở cột "Chọn"
-        for (int i = 0; i < data.length; i++) {
-            if (showSelectColumn && (Boolean) data[i][6]) {
-                rowsToRemove.add(i);
-                System.out.println("Đã xóa nhân viên số:"+rowsToRemove);
-            }
-        }
-        // Xóa các hàng từ cuối đến đầu để không làm xáo trộn chỉ số
-        for (int i = rowsToRemove.size() - 1; i >= 0; i--) {
-            int rowIndex = rowsToRemove.get(i);
-            
-            NhanVien nv = dsNhanVien.get(rowIndex);
-
-            // Xóa khỏi cơ sở dữ liệu
-            try {
-				dao.delete(nv);
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} // Giả sử phương thức delete của dao nhận đối tượng NhanVien
-
-            // Cập nhật dữ liệu của bảng
-            Object[][] newData = new Object[dsNhanVien.size()][columnNames.length];
-            for (int j = 0; j < dsNhanVien.size(); j++) {
-                NhanVien sv = dsNhanVien.get(j);
-                newData[j] = new Object[]{sv.getId(), sv.getHoTen(), sv.getNamSinh(), sv.getDiaChi(), sv.getSdt(), sv.getChucVu(), false};
-            }
-            data = newData;
-        }
-
-        fireTableDataChanged(); // Cập nhật bảng
-    }
-
-    public void removeRow(int rowIndex) {
-        if (rowIndex >= 0 && rowIndex < dsNhanVien.size()) {
-            dsNhanVien.remove(rowIndex); // Xóa khỏi danh sách nhân viên
-
-            // Cập nhật dữ liệu của bảng
-            Object[][] newData = new Object[dsNhanVien.size()][columnNames.length];
-            for (int i = 0; i < dsNhanVien.size(); i++) {
-                NhanVien sv = dsNhanVien.get(i);
-                newData[i] = new Object[]{sv.getId(), sv.getHoTen(), sv.getNamSinh(), sv.getDiaChi(), sv.getSdt(), sv.getChucVu(), false};
-            }
-            data = newData;
-            fireTableDataChanged(); // Cập nhật bảng
+    public void removeNhanVien(NhanVien nv) {
+        int index = dsNhanVien.indexOf(nv);
+        if (index != -1) {
+            dsNhanVien.remove(index);
+            selectionState.remove(index);
+            fireTableDataChanged();
         }
     }
 
+    public ArrayList<NhanVien> getSelectedNhanViens() {
+        ArrayList<NhanVien> selectedNhanViens = new ArrayList<>();
+        for (int i = 0; i < dsNhanVien.size(); i++) {
+            if (selectionState.get(i)) {
+                selectedNhanViens.add(dsNhanVien.get(i));
+            }
+        }
+        return selectedNhanViens;
+    }
+
+    public void setNhanViens(ArrayList<NhanVien> newDsNhanVien) {
+        this.dsNhanVien = new ArrayList<>(newDsNhanVien);
+        this.selectionState = new ArrayList<>(Collections.nCopies(newDsNhanVien.size(), false));
+        fireTableDataChanged();
+    }
+
+    public void clearSelectedNhanViens() {
+        Collections.fill(selectionState, false);
+        fireTableDataChanged();
+    }
 }

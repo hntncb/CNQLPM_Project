@@ -31,15 +31,13 @@ public class ConnectionFactory {
     }
 
     public static void main(String[] args) {
-        ConnectionFactory cf = ConnectionFactory.getInstance(); // Sử dụng getInstance() thay vì tạo đối tượng mới
+        ConnectionFactory cf = ConnectionFactory.getInstance();
         Connection con = null;
         try {
             con = cf.getConnection();
-            // Sử dụng kết nối ở đây
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            // Đảm bảo đóng kết nối để tránh rò rỉ tài nguyên
             if (con != null) {
                 try {
                     con.close();

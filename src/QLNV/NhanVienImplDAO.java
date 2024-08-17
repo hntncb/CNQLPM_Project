@@ -25,6 +25,8 @@ public class NhanVienImplDAO implements DAO {
     private final String sqlUpdate = "UPDATE thong_tin_nhan_vien SET HoTen = ?, NamSinh = ?, DiaChi = ?, SDT = ?, ChucVu = ? WHERE ID = ?";
     private final String sqlDelete = "DELETE FROM thong_tin_nhan_vien WHERE ID = ?";
     private final String sqlSearch = "SELECT * FROM thong_tin_nhan_vien WHERE ID LIKE ? OR HoTen LIKE ?";
+    private static final SimpleDateFormat INPUT_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
+    private static final SimpleDateFormat OUTPUT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static void closeConnection(Connection con) {
         if (con != null) {
@@ -105,64 +107,52 @@ public class NhanVienImplDAO implements DAO {
         }
     }
 
-    private static final SimpleDateFormat INPUT_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    private static final SimpleDateFormat OUTPUT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-    // ... các phương thức khác ...
-
     public void insertByFile(String filePath) throws SQLException, IOException {
         Connection con = null;
         BufferedReader br = null;
         try {
             con = getConnection();
-            con.setAutoCommit(false); // Để cải thiện hiệu suất, thực hiện các chèn trong một giao dịch
+            con.setAutoCommit(false);
             br = new BufferedReader(new FileReader(filePath));
             String line;
-            boolean isFirstLine = true; // Để kiểm tra và loại bỏ BOM nếu có
+            boolean isFirstLine = true;
             while ((line = br.readLine()) != null) {
                 if (isFirstLine) {
-                    // Xử lý BOM nếu có
                     if (line.startsWith("\ufeff")) {
-                        line = line.substring(1); // Loại bỏ ký tự BOM
+                        line = line.substring(1);
                     }
                     isFirstLine = false;
                 }
                 String[] values = line.split(",");
                 if (values.length == 6) {
                     try {
-                        // Chuyển đổi và xử lý dữ liệu từ file CSV
                         int id = Integer.parseInt(values[0].trim());
                         String hoTen = values[1].trim();
                         String namSinhStr = values[2].trim();
                         String diaChi = values[3].trim();
                         String sdt = values[4].trim();
                         String chucVu = values[5].trim();
-
-                        // Chuyển đổi ngày sinh từ định dạng MM/dd/yyyy sang yyyy-MM-dd
                         java.util.Date namSinhDate = INPUT_DATE_FORMAT.parse(namSinhStr);
                         String namSinh = OUTPUT_DATE_FORMAT.format(namSinhDate);
-
-                        // Tạo đối tượng NhanVien và chèn vào cơ sở dữ liệu
                         NhanVien nv = new NhanVien(id, hoTen, namSinh, diaChi, sdt, chucVu);
-                        insert(nv); // Sử dụng phương thức insert để chèn dữ liệu
+                        insert(nv);
                     } catch (NumberFormatException | ParseException e) {
-                        // Xử lý lỗi định dạng
                         System.err.println("Lỗi dữ liệu: " + e.getMessage());
                     }
                 }
             }
-            con.commit(); // Xác nhận các thay đổi
+            con.commit();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             if (con != null) {
                 try {
-                    con.rollback(); // Hoàn tác nếu có lỗi
+                    con.rollback();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
             }
-            throw e; // Ném lại ngoại lệ để thông báo lỗi
+            throw e;
         } finally {
             if (br != null) {
                 try {
@@ -214,7 +204,7 @@ public class NhanVienImplDAO implements DAO {
         ArrayList<NhanVien> resultList = new ArrayList<>();
         try {
             pstmt = con.prepareStatement(sqlSearch);
-            String searchPattern = "%" + keyword + "%"; // Tạo mẫu tìm kiếm với từ khóa
+            String searchPattern = "%" + keyword + "%";
             pstmt.setString(1, searchPattern);
             pstmt.setString(2, searchPattern);
 

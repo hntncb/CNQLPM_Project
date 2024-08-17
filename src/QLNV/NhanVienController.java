@@ -38,6 +38,7 @@ public class NhanVienController {
         nhanVienView.addInsertNhanVienListener(new InsertNhanVienListener());
         nhanVienView.addClearNhanVienListener(new ClearNhanVienListener());
         nhanVienView.addSearchNhanVienListener(new SearchNhanVienListener());
+        nhanVienView.addSelectListListener(new SelectListListener());
         nhanVienView.setButtonVisibility(userType == UserType.ADMIN);
         nhanVienView.setVisible(true);
         nhanVienView.setEnabled(true);
@@ -50,17 +51,25 @@ public class NhanVienController {
         }
     }
 
-    class ClearNhanVienListener implements ActionListener{
+    class ClearNhanVienListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-        	try {
+            System.out.println("Bấm clear");
+            try {
                 nhanVienView.clearNhanVienInfo();
-                nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
+                refreshTableData();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
         }
     }
+
+    private void refreshTableData() throws SQLException {
+        ArrayList<NhanVien> allNhanViens = dao.getAll();
+        nhanVienModel.setNhanViens(allNhanViens);
+        nhanVienView.showListNhanVien(nhanVienModel);
+    }
+
 
     class InsertNhanVienListener implements ActionListener {
         @Override
@@ -98,35 +107,29 @@ public class NhanVienController {
             }
         }
     }
-
+    int count = 0;
     class DeleteNhanVienListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                if (nhanVienModel.isShowSelectColumn()) {
-                    // Nếu cột "Chọn" được hiển thị, xóa các hàng đã chọn
-                    nhanVienModel.removeSelectedRows();
-                    nhanVienView.showMessage("Xóa các hàng đã chọn thành công!");
-                } else {
-                    // Nếu không có cột "Chọn", xóa hàng hiện tại
-                    NhanVien nv = nhanVienView.getNhanVienInfo();
-                    if (nv != null) {
+        	count++;
+        	System.out.println("Lần xóa thứ"+count);
+            ArrayList<NhanVien> selectedNhanViens = nhanVienModel.getSelectedNhanViens();
+            System.out.println("Controller: Nhân viên được chọn:" + selectedNhanViens);
+            if (!selectedNhanViens.isEmpty()) {
+                try {
+                    for (NhanVien nv : selectedNhanViens) {
+                        System.out.println("Nhân viên bị xóa:" + nv);
                         dao.delete(nv);
-                        nhanVienView.clearNhanVienInfo();
-                        ArrayList<NhanVien> ds = dao.getAll();
-                        if (ds != null) {
-                            nhanVienView.showListNhanVien(new NhanVienTableModel(ds));
-                        } else {
-                            nhanVienView.showMessage("Dữ liệu rỗng");
-                        }
-                        nhanVienView.showMessage("Xóa thành công!");
+                        nhanVienModel.removeNhanVien(nv);
                     }
+                    nhanVienView.clearNhanVienInfo();
+                    nhanVienView.showMessage("Xóa thành công!");
+                    refreshTableData();
+                } catch (SQLException ex) {
+                    nhanVienView.showMessage("Lỗi: " + ex.toString());
                 }
-                nhanVienView.clearNhanVienInfo();
-                nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
-            } catch (SQLException e1) {
-                nhanVienView.showMessage("Đã xảy ra lỗi khi xóa: " + e1.getMessage());
-                e1.printStackTrace();
+            } else {
+                nhanVienView.showMessage("Vui lòng chọn ít nhất một nhân viên để xóa.");
             }
         }
     }
@@ -150,17 +153,35 @@ public class NhanVienController {
     class SearchNhanVienListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String keyword = nhanVienView.getSearchKeyword(); // Lấy từ khóa tìm kiếm từ View
+            String keyword = nhanVienView.getSearchKeyword();
             try {
-                ArrayList<NhanVien> searchResults = dao.search(keyword); // Tìm kiếm nhiều nhân viên
+                ArrayList<NhanVien> searchResults = dao.search(keyword);
                 if (searchResults.isEmpty()) {
                     nhanVienView.showMessage("Không tìm thấy kết quả.");
                 } else {
-                    nhanVienView.showListNhanVien(new NhanVienTableModel(searchResults)); // Hiển thị kết quả tìm kiếm
+                    nhanVienView.showListNhanVien(new NhanVienTableModel(searchResults));
                 }
             } catch (SQLException ex) {
                 nhanVienView.showMessage("Lỗi: " + ex.getMessage());
             }
         }
     }
+    
+    class SelectListListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ArrayList<NhanVien> selected = nhanVienModel.getSelectedNhanViens();
+            System.out.println("Nhân viên được chọn:"+selected);
+            if (selected.isEmpty()) {
+                nhanVienView.showMessage("Không có nhân viên nào được chọn.");
+            } else {
+                System.out.println(selected);
+            }
+        }
+    }
+    void nhanvienduocchon() {
+    	ArrayList<NhanVien> selected = nhanVienModel.getSelectedNhanViens();
+        System.out.println("Controller: Nhân viên được chọn:"+selected);
+    }
+
 }
