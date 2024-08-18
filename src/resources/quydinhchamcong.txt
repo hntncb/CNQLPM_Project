@@ -1,0 +1,11 @@
+Số: Thời gian làm việc được tính lương (số giờ).
+H: Thời gian tham gia các hoạt động như hội nghị, đào tạo.
+Nb: Nghỉ bù.
+NL: Nghỉ lễ.
+Co: Nghỉ chăm sóc con ốm.
+K: Nghỉ không lương.
+Ts: Nghỉ thai sản.
+N: Ngừng việc.
+T: Tai nạn.
+C: Lao động nghĩa vụ.
+P: Nghỉ phép đã được duyệt.
