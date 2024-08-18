@@ -39,9 +39,39 @@ public class NhanVienController {
         nhanVienView.addClearNhanVienListener(new ClearNhanVienListener());
         nhanVienView.addSearchNhanVienListener(new SearchNhanVienListener());
         nhanVienView.addSelectListListener(new SelectListListener());
+        nhanVienView.addNextPageListener(new NextPageListener());
+        nhanVienView.addPreviousPageListener(new PreviousPageListener());
         nhanVienView.setButtonVisibility(userType == UserType.ADMIN);
         nhanVienView.setVisible(true);
         nhanVienView.setEnabled(true);
+        updatePageInfo();
+    }
+    
+    private void updatePageInfo() {
+        nhanVienView.updatePageInfo(nhanVienModel.getCurrentPage(), nhanVienModel.getTotalPages());
+    }
+
+    class NextPageListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            nhanVienModel.nextPage();
+            updatePageInfo();
+        }
+    }
+
+    class PreviousPageListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            nhanVienModel.previousPage();
+            updatePageInfo();
+        }
+    }
+
+    private void refreshTableData() throws SQLException {
+        ArrayList<NhanVien> allNhanViens = dao.getAll();
+        nhanVienModel.setNhanViens(allNhanViens);
+        nhanVienView.showListNhanVien(nhanVienModel);
+        updatePageInfo();
     }
 
     class ListNhanVienSelectionListener implements ListSelectionListener {
@@ -63,13 +93,6 @@ public class NhanVienController {
             }
         }
     }
-
-    private void refreshTableData() throws SQLException {
-        ArrayList<NhanVien> allNhanViens = dao.getAll();
-        nhanVienModel.setNhanViens(allNhanViens);
-        nhanVienView.showListNhanVien(nhanVienModel);
-    }
-
 
     class InsertNhanVienListener implements ActionListener {
         @Override
@@ -107,18 +130,13 @@ public class NhanVienController {
             }
         }
     }
-    int count = 0;
     class DeleteNhanVienListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-        	count++;
-        	System.out.println("Lần xóa thứ"+count);
             ArrayList<NhanVien> selectedNhanViens = nhanVienModel.getSelectedNhanViens();
-            System.out.println("Controller: Nhân viên được chọn:" + selectedNhanViens);
             if (!selectedNhanViens.isEmpty()) {
                 try {
                     for (NhanVien nv : selectedNhanViens) {
-                        System.out.println("Nhân viên bị xóa:" + nv);
                         dao.delete(nv);
                         nhanVienModel.removeNhanVien(nv);
                     }
@@ -179,9 +197,4 @@ public class NhanVienController {
             }
         }
     }
-    void nhanvienduocchon() {
-    	ArrayList<NhanVien> selected = nhanVienModel.getSelectedNhanViens();
-        System.out.println("Controller: Nhân viên được chọn:"+selected);
-    }
-
 }

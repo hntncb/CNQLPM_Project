@@ -9,18 +9,15 @@ import java.sql.SQLException;
 
 public class SubFrame extends JFrame {
     private UserType userType;
-
-    // Constructor nhận quyền người dùng
+    
     public SubFrame(UserType userType) {
         this.userType = userType;
 
-        // Cài đặt tiêu đề và kích thước cho JFrame
         setTitle("Ứng dụng Quản lý Nhân viên");
         setSize(300, 200);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Tạo các nút
         JButton btnThongTinNhanVien = new JButton("Thông tin nhân viên");
         JButton btnChamCong = new JButton("Chấm công");
         JButton btnDangXuat = new JButton("Đăng xuất");
@@ -47,8 +44,20 @@ public class SubFrame extends JFrame {
         btnChamCong.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ChamCong chamcong = new ChamCong();
-                chamcong.setVisible(true);
+            	
+				try {
+					NhanVienImplDAO nhanVienDAO = new NhanVienImplDAO();
+                    NhanVienTableModel nhanVienModel = new NhanVienTableModel(nhanVienDAO.getAll());
+                    NhanVienView nhanVienView = new NhanVienView();
+                    NhanVienController controller = new NhanVienController(nhanVienView, nhanVienModel);
+	            	controller.setUserType(userType);
+	                ChamCong chamcong = new ChamCong(userType);
+	                chamcong.setVisible(true);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+                
             }
         });
 
@@ -63,21 +72,13 @@ public class SubFrame extends JFrame {
             }
         });
 
-        // Tạo một panel để chứa các nút
         JPanel panel = new JPanel();
         panel.add(btnThongTinNhanVien);
         panel.add(btnChamCong);
         panel.add(btnDangXuat);
-
-        // Điều chỉnh các nút dựa trên quyền người dùng
-
-        // Thêm panel vào JFrame
         add(panel);
-
-        // Hiển thị JFrame
         setVisible(true);
 
-        // Thêm WindowListener để hiển thị hộp thoại xác nhận khi đóng cửa sổ
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

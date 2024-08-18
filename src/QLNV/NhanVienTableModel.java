@@ -9,6 +9,8 @@ public class NhanVienTableModel extends AbstractTableModel {
     private ArrayList<NhanVien> dsNhanVien;
     private ArrayList<Boolean> selectionState;
     private final String[] columnNames = {"ID", "HoTen", "NamSinh", "DiaChi", "SDT", "ChucVu", "Chọn"};
+    private int pageSize = 30;
+    private int currentPage = 0;
 
     public NhanVienTableModel(ArrayList<NhanVien> dsNhanVien) {
         this.dsNhanVien = new ArrayList<>(dsNhanVien);
@@ -17,7 +19,8 @@ public class NhanVienTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return dsNhanVien.size();
+        int start = currentPage * pageSize;
+        return Math.min(pageSize, dsNhanVien.size() - start);
     }
 
     @Override
@@ -27,13 +30,48 @@ public class NhanVienTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        NhanVien nv = dsNhanVien.get(rowIndex);
+        int actualIndex = currentPage * pageSize + rowIndex;
+        NhanVien nv = dsNhanVien.get(actualIndex);
         if (columnIndex == 6) {
-            return selectionState.get(rowIndex);
+            return selectionState.get(actualIndex);
         }
         return getValueForColumn(nv, columnIndex);
     }
 
+    @Override
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        int actualIndex = currentPage * pageSize + rowIndex;
+        NhanVien nv = dsNhanVien.get(actualIndex);
+        if (columnIndex == 6) {
+            selectionState.set(actualIndex, (Boolean) value);
+        } else {
+            setValueForColumn(nv, columnIndex, value);
+        }
+        fireTableCellUpdated(rowIndex, columnIndex);
+    }
+
+    public void nextPage() {
+        if ((currentPage + 1) * pageSize < dsNhanVien.size()) {
+            currentPage++;
+            fireTableDataChanged();
+        }
+    }
+
+    public void previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            fireTableDataChanged();
+        }
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public int getTotalPages() {
+        return (int) Math.ceil((double) dsNhanVien.size() / pageSize);
+    }
+    
     private Object getValueForColumn(NhanVien nv, int columnIndex) {
         if (columnIndex == 0) return nv.getId();
         if (columnIndex == 1) return nv.getHoTen();
@@ -44,16 +82,7 @@ public class NhanVienTableModel extends AbstractTableModel {
         return null;
     }
 
-    @Override
-    public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        NhanVien nv = dsNhanVien.get(rowIndex);
-        if (columnIndex == 6) {
-            selectionState.set(rowIndex, (Boolean) value);
-        } else {
-            setValueForColumn(nv, columnIndex, value);
-        }
-        fireTableCellUpdated(rowIndex, columnIndex);
-    }
+    
 
     private void setValueForColumn(NhanVien nv, int columnIndex, Object value) {
         if (columnIndex == 0) nv.setId((Integer) value);

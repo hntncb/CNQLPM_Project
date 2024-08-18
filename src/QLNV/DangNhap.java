@@ -1,12 +1,12 @@
 package QLNV;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.*;
 
 public class DangNhap extends JFrame implements ActionListener {
     private JLabel titleLabel, usernameLabel, passwordLabel;
@@ -48,11 +48,30 @@ public class DangNhap extends JFrame implements ActionListener {
         passwordField.addActionListener(e -> loginButton.doClick());
     }
 
+    private boolean isValidInput(String input) {
+        for (char c : input.toCharArray()) {
+            String charStr = String.valueOf(c);
+            if (!TextFieldValidator.isNumber(charStr) && !TextFieldValidator.isChar(charStr)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginButton) {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
+            
+            if (!isValidInput(username) || !isValidInput(password)) {
+                JOptionPane.showMessageDialog(this, 
+                    "Tên đăng nhập và mật khẩu chỉ được chứa ký tự hoặc số.", 
+                    "Lỗi nhập liệu", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
             UserType userType = authenticateUser(username, password);
             if (userType != null) {
                 JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
@@ -85,11 +104,9 @@ public class DangNhap extends JFrame implements ActionListener {
     }
 
     private void handleSuccessfulLogin(UserType userType) {
-        // Mở SubFrame và truyền quyền người dùng vào
         SwingUtilities.invokeLater(() -> {
             SubFrame subFrame = new SubFrame(userType);
             subFrame.setVisible(true);
         });
     }
-
 }

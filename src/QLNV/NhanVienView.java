@@ -1,6 +1,7 @@
 package QLNV;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
@@ -14,6 +15,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 
@@ -21,13 +25,14 @@ public class NhanVienView extends JFrame {
 
     private JTable table;
     private TableRowSorter<NhanVienTableModel> rowSorter;
-    private JButton btnThem, btnSua, btnXoa, btnClear, btnSearch, btnInsertByFile,btnSelectList;
+    private JButton btnThem, btnSua, btnXoa, btnClear, btnSearch, btnInsertByFile,btnSelectList,btnNext, btnPrevious;
     private JTextField txtID, txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu, txtSearch;
     private NhanVienTableModel model;
+    private JLabel lblPageInfo;
 
     public NhanVienView() {
         setTitle("Quản lý nhân viên");
-        setSize(1300, 750);
+        setSize(1300, 730);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -41,9 +46,9 @@ public class NhanVienView extends JFrame {
         rowSorter = new TableRowSorter<>();
         table.setRowSorter(rowSorter);
 
-        panel.add(new JLabel("ID:"));
+        //panel.add(new JLabel("ID:"));
         txtID = new JTextField();
-        panel.add(txtID);
+        //panel.add(txtID);
 
         panel.add(new JLabel("Họ tên:"));
         txtHoTen = new JTextField();
@@ -93,10 +98,58 @@ public class NhanVienView extends JFrame {
         buttonPanel.add(btnSearch);
         
         btnSelectList = new JButton("Lấy danh sách chọn");
-        buttonPanel.add(btnSelectList);
+        //buttonPanel.add(btnSelectList);
         
-        add(buttonPanel, BorderLayout.SOUTH);
-        
+        JPanel paginationPanel = new JPanel();
+        btnPrevious = new JButton("Trước");
+        btnNext = new JButton("Sau");
+        lblPageInfo = new JLabel("Page 1 of 1");
+        paginationPanel.add(btnPrevious);
+        paginationPanel.add(lblPageInfo);
+        paginationPanel.add(btnNext);
+
+        JPanel mainPanel = new JPanel(new GridLayout(1, 2)); // Tạo một panel với 1 hàng, 2 cột
+        mainPanel.add(paginationPanel);
+        mainPanel.add(buttonPanel);
+        add(mainPanel, BorderLayout.SOUTH);
+        setupTextFieldValidation();
+    }
+    private void setupTextFieldValidation() {
+        addTextFieldValidator(txtHoTen, TextFieldValidator::isChar);
+        addTextFieldValidator(txtChucVu, TextFieldValidator::isChar);
+        addTextFieldValidator(txtDiaChi, TextFieldValidator::isChar);
+        addTextFieldValidator(txtNamSinh, input -> TextFieldValidator.isDate(input) || input.isEmpty());
+        addTextFieldValidator(txtSDT, input -> TextFieldValidator.isPhone(input) && TextFieldValidator.charLimit(input, 11));
+        addTextFieldValidator(txtSearch, TextFieldValidator::isAlphanumeric);
+    }
+    private void addTextFieldValidator(JTextField textField, java.util.function.Predicate<String> validator) {
+        textField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                validate();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                validate();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                validate();
+            }
+
+//            private void validate() {
+//                SwingUtilities.invokeLater(() -> {
+//                    String text = textField.getText();
+//                    if (!validator.test(text)) {
+//                        textField.setForeground(Color.RED);
+//                    } else {
+//                        textField.setForeground(Color.BLACK);
+//                    }
+//                });
+//            }
+        });
     }
 
     public void showListNhanVien(NhanVienTableModel model) {
@@ -120,6 +173,27 @@ public class NhanVienView extends JFrame {
                 JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin.");
                 return null;
             }
+
+            if (!TextFieldValidator.isChar(hoTen) || !TextFieldValidator.isChar(chucVu)) {
+                JOptionPane.showMessageDialog(this, "Họ tên và Chức vụ chỉ được chứa ký tự chữ cái.");
+                return null;
+            }
+
+            if (!TextFieldValidator.isAlphanumeric(diaChi)) {
+                JOptionPane.showMessageDialog(this, "Địa chỉ chỉ được chứa ký tự chữ cái và số.");
+                return null;
+            }
+
+            if (!TextFieldValidator.isDate(namSinh)) {
+                JOptionPane.showMessageDialog(this, "Năm sinh phải có định dạng YYYY-MM-DD.");
+                return null;
+            }
+
+            if (!TextFieldValidator.isPhone(sdt) || !TextFieldValidator.charLimit(sdt, 11)) {
+                JOptionPane.showMessageDialog(this, "Số điện thoại phải là số và không quá 11 ký tự.");
+                return null;
+            }
+
             return new NhanVien(id, hoTen, namSinh, diaChi, sdt, chucVu);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "ID phải là một số nguyên.");
@@ -147,6 +221,18 @@ public class NhanVienView extends JFrame {
         txtSDT.setText("");
         txtChucVu.setText("");
         txtSearch.setText("");
+    }
+    
+    public void updatePageInfo(int currentPage, int totalPages) {
+        lblPageInfo.setText("Page " + (currentPage + 1) + " of " + totalPages);
+    }
+
+    public void addNextPageListener(ActionListener listener) {
+        btnNext.addActionListener(listener);
+    }
+
+    public void addPreviousPageListener(ActionListener listener) {
+        btnPrevious.addActionListener(listener);
     }
 
     public void addListNhanVienSelectionListener(ListSelectionListener listener) {
