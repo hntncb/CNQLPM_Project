@@ -35,6 +35,12 @@ public class NhanVienView extends JFrame {
     private JTextField txtID, txtHoTen, txtNamSinh, txtDiaChi, txtSDT, txtChucVu, txtSearch;
     private NhanVienTableModel model;
     private JLabel lblPageInfo;
+    ImageIcon iconSearch = new ImageIcon("src/resources/search.png");
+    ImageIcon iconInsert = new ImageIcon("src/resources/insert.png");
+    ImageIcon iconInsertFile = new ImageIcon("src/resources/insertfile.png");
+    ImageIcon iconEdit = new ImageIcon("src/resources/edit.png");
+    ImageIcon iconDelete= new ImageIcon("src/resources/delete.png");
+    ImageIcon iconClear= new ImageIcon("src/resources/clear.png");
 
     public NhanVienView() {
         setTitle("Quản lý nhân viên");
@@ -47,7 +53,7 @@ public class NhanVienView extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(6, 2));
+        panel.setLayout(new GridLayout(6, 3));
 
         rowSorter = new TableRowSorter<>();
         table.setRowSorter(rowSorter);
@@ -99,29 +105,29 @@ public class NhanVienView extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(1,5));
 
-        btnThem = new JButton("Thêm");
+        btnThem = new JButton("Thêm",iconInsert);
         buttonPanel.add(btnThem);
 
-        btnInsertByFile = new JButton("Chèn File");
+        btnInsertByFile = new JButton("Nhập dữ liệu",iconInsertFile);
         buttonPanel.add(btnInsertByFile);
 
-        btnSua = new JButton("Sửa");
+        btnSua = new JButton("Sửa",iconEdit);
         buttonPanel.add(btnSua);
 
-        btnXoa = new JButton("Xóa");
+        btnXoa = new JButton("Xóa",iconDelete);
         buttonPanel.add(btnXoa);
 
-        btnClear = new JButton("Clear");
+        btnClear = new JButton("Clear",iconClear);
         buttonPanel.add(btnClear);
-        ImageIcon iconbtnSearch = new ImageIcon("src/resources/search.png");
-        btnSearch = new JButton(iconbtnSearch);
         
-        btnThem.setPreferredSize(new Dimension(100, 25));
-        btnSua.setPreferredSize(new Dimension(100, 25));
-        btnXoa.setPreferredSize(new Dimension(100, 25));
-        btnInsertByFile.setPreferredSize(new Dimension(100, 25));
-        btnClear.setPreferredSize(new Dimension(100, 25));
-        btnSearch.setPreferredSize(new Dimension(25, 25));
+        btnSearch = new JButton(iconSearch);
+        
+        btnThem.setPreferredSize(new Dimension(100, 30));
+        btnSua.setPreferredSize(new Dimension(100, 30));
+        btnXoa.setPreferredSize(new Dimension(100, 30));
+        btnInsertByFile.setPreferredSize(new Dimension(100, 30));
+        btnClear.setPreferredSize(new Dimension(100, 30));
+        btnSearch.setPreferredSize(new Dimension(30, 30));
         
         btnSelectList = new JButton("Chọn nhiều");
         //buttonPanel.add(btnSelectList);
