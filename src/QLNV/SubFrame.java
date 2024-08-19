@@ -1,11 +1,17 @@
 package QLNV;
 
-import javax.swing.*;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 public class SubFrame extends JFrame {
     private UserType userType;
@@ -13,14 +19,21 @@ public class SubFrame extends JFrame {
     public SubFrame(UserType userType) {
         this.userType = userType;
 
-        setTitle("Ứng dụng Quản lý Nhân viên");
-        setSize(300, 200);
+        setTitle("Quản lý Nhân viên");
+        setSize(350, 300);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
-
-        JButton btnThongTinNhanVien = new JButton("Thông tin nhân viên");
-        JButton btnChamCong = new JButton("Chấm công");
-        JButton btnDangXuat = new JButton("Đăng xuất");
+        
+        ImageIcon iconThongTinNhanVien = new ImageIcon("src/resources/employee.png");
+        ImageIcon iconChamCong = new ImageIcon("src/resources/chamcong.png");
+        ImageIcon iconThoat = new ImageIcon("src/resources/exit.png");
+        
+        JButton btnThongTinNhanVien = new JButton("Nhân viên",iconThongTinNhanVien);
+        btnThongTinNhanVien.setPreferredSize(new Dimension(150, 60));
+        JButton btnChamCong = new JButton("Chấm công",iconChamCong);
+        btnChamCong.setPreferredSize(new Dimension(150, 60));
+        JButton btnDangXuat = new JButton("Đăng xuất",iconThoat);
+        btnDangXuat.setPreferredSize(new Dimension(150, 60));
 
         // Cài đặt ActionListener cho nút "Thông tin nhân viên"
         btnThongTinNhanVien.addActionListener(new ActionListener() {

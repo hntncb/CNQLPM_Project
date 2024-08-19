@@ -2,11 +2,16 @@ package QLNV;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,6 +24,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 public class NhanVienView extends JFrame {
@@ -41,8 +47,8 @@ public class NhanVienView extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(7, 2));
-        
+        panel.setLayout(new GridLayout(6, 2));
+
         rowSorter = new TableRowSorter<>();
         table.setRowSorter(rowSorter);
 
@@ -70,14 +76,28 @@ public class NhanVienView extends JFrame {
         txtChucVu = new JTextField();
         panel.add(txtChucVu);
 
-        panel.add(new JLabel("Tìm kiếm:"));
+        JLabel lSearch = new JLabel("Tìm kiếm:");
         txtSearch = new JTextField();
-        panel.add(txtSearch);
-
-        add(panel, BorderLayout.NORTH);
+        txtSearch.setPreferredSize(new Dimension(200,30));
+        txtSearch.setText("nhập ID hoặc Tên vào đây để tìm kiếm");
+        txtSearch.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				if(txtSearch.getText().isEmpty()) {
+					txtSearch.setText("nhập ID hoặc Tên vào đây để tìm kiếm");
+				}
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				if(txtSearch.getText().equals("nhập ID hoặc Tên vào đây để tìm kiếm")) {
+					txtSearch.setText("");
+				}
+			}
+		});
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout());
+        buttonPanel.setLayout(new GridLayout(1,5));
 
         btnThem = new JButton("Thêm");
         buttonPanel.add(btnThem);
@@ -93,26 +113,69 @@ public class NhanVienView extends JFrame {
 
         btnClear = new JButton("Clear");
         buttonPanel.add(btnClear);
-
-        btnSearch = new JButton("Tìm kiếm");
-        buttonPanel.add(btnSearch);
+        ImageIcon iconbtnSearch = new ImageIcon("src/resources/search.png");
+        btnSearch = new JButton(iconbtnSearch);
         
-        btnSelectList = new JButton("Lấy danh sách chọn");
+        btnThem.setPreferredSize(new Dimension(100, 25));
+        btnSua.setPreferredSize(new Dimension(100, 25));
+        btnXoa.setPreferredSize(new Dimension(100, 25));
+        btnInsertByFile.setPreferredSize(new Dimension(100, 25));
+        btnClear.setPreferredSize(new Dimension(100, 25));
+        btnSearch.setPreferredSize(new Dimension(25, 25));
+        
+        btnSelectList = new JButton("Chọn nhiều");
         //buttonPanel.add(btnSelectList);
         
         JPanel paginationPanel = new JPanel();
+        JPanel searchPanel = new JPanel();
+        searchPanel.add(lSearch);
+        searchPanel.add(txtSearch);
+        searchPanel.add(btnSearch);
+        
         btnPrevious = new JButton("Trước");
         btnNext = new JButton("Sau");
         lblPageInfo = new JLabel("Page 1 of 1");
+        
         paginationPanel.add(btnPrevious);
         paginationPanel.add(lblPageInfo);
         paginationPanel.add(btnNext);
 
-        JPanel mainPanel = new JPanel(new GridLayout(1, 2)); // Tạo một panel với 1 hàng, 2 cột
-        mainPanel.add(paginationPanel);
-        mainPanel.add(buttonPanel);
-        add(mainPanel, BorderLayout.SOUTH);
+        JPanel northPanel = new JPanel(new GridLayout(1, 2));
+        add(northPanel, BorderLayout.NORTH);
+        northPanel.add(panel);
+        searchPanel.add(buttonPanel);
+        northPanel.add(searchPanel);
+        add(paginationPanel, BorderLayout.SOUTH);
         setupTextFieldValidation();
+        configureTable();
+    }
+    private void configureTable() {
+        // Cấu hình màu sắc và font cho bảng
+        CustomTableCellRenderer renderer = new CustomTableCellRenderer(
+            Color.ORANGE,  // Màu nền hàng chẵn
+            new Color(240, 240, 240),  // Màu nền hàng lẻ (xám nhạt)
+            new Color(0, 120, 215),  // Màu nền tiêu đề cột (xanh)
+            Color.WHITE,  // Màu chữ tiêu đề cột
+            new Font("Arial", Font.BOLD, 14) // Font tiêu đề cột
+        );
+        
+        // Áp dụng renderer cho tất cả các ô trong bảng
+        table.setDefaultRenderer(Object.class, renderer);
+        
+        // Áp dụng renderer cho tiêu đề cột
+        table.getTableHeader().setDefaultRenderer(renderer);
+        
+        // Không cho phép di chuyển cột
+        table.getTableHeader().setReorderingAllowed(false);
+        
+        // Tắt việc thay đổi kích thước cột bằng chuột
+        table.getTableHeader().setResizingAllowed(false);
+        
+        // Đặt màu nền cho tiêu đề cột
+        table.getTableHeader().setBackground(new Color(0, 120, 215));
+        
+        // Đặt màu chữ cho tiêu đề cột
+        table.getTableHeader().setForeground(Color.WHITE);
     }
     private void setupTextFieldValidation() {
         addTextFieldValidator(txtHoTen, TextFieldValidator::isChar);
@@ -139,16 +202,16 @@ public class NhanVienView extends JFrame {
                 validate();
             }
 
-//            private void validate() {
-//                SwingUtilities.invokeLater(() -> {
-//                    String text = textField.getText();
-//                    if (!validator.test(text)) {
-//                        textField.setForeground(Color.RED);
-//                    } else {
-//                        textField.setForeground(Color.BLACK);
-//                    }
-//                });
-//            }
+            private void validate() {
+                SwingUtilities.invokeLater(() -> {
+                    String text = textField.getText();
+                    if (!validator.test(text)) {
+                        textField.setForeground(Color.RED);
+                    } else {
+                        textField.setForeground(Color.BLACK);
+                    }
+                });
+            }
         });
     }
 
@@ -156,9 +219,33 @@ public class NhanVienView extends JFrame {
         this.model = model;
         table.setModel(model);
         rowSorter.setModel(model);
+
+        // Áp dụng lại renderer sau khi set model
+        configureTable();
+
+        // ... (phần còn lại của phương thức)
+
+        // Đặt kích thước cho các cột
+        TableColumnModel columnModel = table.getColumnModel();
+
+        // Cài đặt kích thước cho từng cột theo chỉ số của cột
+        columnModel.getColumn(0).setPreferredWidth(50); // Cột ID
+        columnModel.getColumn(1).setPreferredWidth(250); // Cột Họ tên
+        columnModel.getColumn(2).setPreferredWidth(200); // Cột Năm sinh
+        columnModel.getColumn(3).setPreferredWidth(600); // Cột Địa chỉ
+        columnModel.getColumn(4).setPreferredWidth(200); // Cột SĐT
+        columnModel.getColumn(5).setPreferredWidth(200); // Cột Chức vụ
+
+        // Nếu có cột thứ 6, bạn có thể đặt kích thước cho nó, ví dụ:
+        if (columnModel.getColumnCount() > 6) {
+            columnModel.getColumn(6).setPreferredWidth(100); // Cột Boolean hoặc cột khác
+        }
+
+        // Thiết lập renderer và editor cho cột, nếu cần
         table.getColumnModel().getColumn(6).setCellRenderer(table.getDefaultRenderer(Boolean.class));
         table.getColumnModel().getColumn(6).setCellEditor(table.getDefaultEditor(Boolean.class));
-    }	
+    }
+	
 
     public NhanVien getNhanVienInfo() {
         try {

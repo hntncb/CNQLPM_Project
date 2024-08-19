@@ -8,7 +8,7 @@ import javax.swing.table.AbstractTableModel;
 public class NhanVienTableModel extends AbstractTableModel {
     private ArrayList<NhanVien> dsNhanVien;
     private ArrayList<Boolean> selectionState;
-    private final String[] columnNames = {"ID", "HoTen", "NamSinh", "DiaChi", "SDT", "ChucVu", "Chọn"};
+    private final String[] columnNames = {"ID", "Họ Tên", "Năm sinh", "Địa chỉ", "SDT", "Chức vụ", "Chọn"};
     private int pageSize = 30;
     private int currentPage = 0;
 
@@ -81,9 +81,7 @@ public class NhanVienTableModel extends AbstractTableModel {
         if (columnIndex == 5) return nv.getChucVu();
         return null;
     }
-
     
-
     private void setValueForColumn(NhanVien nv, int columnIndex, Object value) {
         if (columnIndex == 0) nv.setId((Integer) value);
         if (columnIndex == 1) nv.setHoTen((String) value);
