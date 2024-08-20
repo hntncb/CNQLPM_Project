@@ -122,6 +122,7 @@ public class NhanVienImplDAO implements DAO {
                         line = line.substring(1);
                     }
                     isFirstLine = false;
+                    continue; // Bỏ qua dòng tiêu đề
                 }
                 String[] values = line.split(",");
                 if (values.length == 6) {
@@ -134,6 +135,7 @@ public class NhanVienImplDAO implements DAO {
                         String chucVu = values[5].trim();
                         java.util.Date namSinhDate = INPUT_DATE_FORMAT.parse(namSinhStr);
                         String namSinh = OUTPUT_DATE_FORMAT.format(namSinhDate);
+                        
                         NhanVien nv = new NhanVien(id, hoTen, namSinh, diaChi, sdt, chucVu);
                         insert(nv);
                     } catch (NumberFormatException | ParseException e) {

@@ -3,7 +3,6 @@ package QLNV;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
@@ -58,9 +57,9 @@ public class NhanVienView extends JFrame {
         rowSorter = new TableRowSorter<>();
         table.setRowSorter(rowSorter);
 
-        //panel.add(new JLabel("ID:"));
+        panel.add(new JLabel("ID:"));
         txtID = new JTextField();
-        //panel.add(txtID);
+        panel.add(txtID);
 
         panel.add(new JLabel("Họ tên:"));
         txtHoTen = new JTextField();
@@ -140,7 +139,7 @@ public class NhanVienView extends JFrame {
         
         btnPrevious = new JButton("Trước");
         btnNext = new JButton("Sau");
-        lblPageInfo = new JLabel("Page 1 of 1");
+        lblPageInfo = new JLabel("Trang 1/1");
         
         paginationPanel.add(btnPrevious);
         paginationPanel.add(lblPageInfo);
@@ -186,9 +185,9 @@ public class NhanVienView extends JFrame {
     private void setupTextFieldValidation() {
         addTextFieldValidator(txtHoTen, TextFieldValidator::isChar);
         addTextFieldValidator(txtChucVu, TextFieldValidator::isChar);
-        addTextFieldValidator(txtDiaChi, TextFieldValidator::isChar);
+        addTextFieldValidator(txtDiaChi, TextFieldValidator::isAlphanumeric);
         addTextFieldValidator(txtNamSinh, input -> TextFieldValidator.isDate(input) || input.isEmpty());
-        addTextFieldValidator(txtSDT, input -> TextFieldValidator.isPhone(input) && TextFieldValidator.charLimit(input, 11));
+        addTextFieldValidator(txtSDT, input -> TextFieldValidator.isNumber(input) && TextFieldValidator.charLimit(input, 10));
         addTextFieldValidator(txtSearch, TextFieldValidator::isAlphanumeric);
     }
     private void addTextFieldValidator(JTextField textField, java.util.function.Predicate<String> validator) {
@@ -244,7 +243,7 @@ public class NhanVienView extends JFrame {
 
         // Nếu có cột thứ 6, bạn có thể đặt kích thước cho nó, ví dụ:
         if (columnModel.getColumnCount() > 6) {
-            columnModel.getColumn(6).setPreferredWidth(100); // Cột Boolean hoặc cột khác
+            columnModel.getColumn(6).setPreferredWidth(50); // Cột Boolean hoặc cột khác
         }
 
         // Thiết lập renderer và editor cho cột, nếu cần

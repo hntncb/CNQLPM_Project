@@ -101,11 +101,11 @@ public class NhanVienController {
             if (nv != null) {
                 try {
                     dao.insert(nv);
-                    nhanVienView.clearNhanVienInfo();
                     nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
+                    nhanVienView.clearNhanVienInfo();
                     nhanVienView.showMessage("Thêm thành công!");
                 } catch (SQLException e1) {
-                    nhanVienView.showMessage(e1.toString());
+                    nhanVienView.showMessage("Trùng ID");
                 }
             }
         }
@@ -123,7 +123,7 @@ public class NhanVienController {
                 try {
                     dao.insertByFile(selectedFile.getAbsolutePath());
                     nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
-                    nhanVienView.showMessage("Chèn dữ liệu từ file thành công!");
+                    nhanVienView.showMessage("Thêm dữ liệu từ file thành công!");
                 } catch (SQLException | IOException ex) {
                     nhanVienView.showMessage("Lỗi: " + ex.getMessage());
                 }
