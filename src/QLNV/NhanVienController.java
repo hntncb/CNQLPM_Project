@@ -84,7 +84,6 @@ public class NhanVienController {
     class ClearNhanVienListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Bấm clear");
             try {
                 nhanVienView.clearNhanVienInfo();
                 refreshTableData();
@@ -152,27 +151,6 @@ public class NhanVienController {
             }
         }
     }
-//    class DeleteNhanVienListener implements ActionListener {
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            ArrayList<NhanVien> selectedNhanViens = nhanVienModel.getSelectedNhanViens();
-//            if (!selectedNhanViens.isEmpty()) {
-//                try {
-//                    for (NhanVien nv : selectedNhanViens) {
-//                        dao.delete(nv);
-//                        nhanVienModel.removeNhanVien(nv);
-//                    }
-//                    nhanVienView.clearNhanVienInfo();
-//                    nhanVienView.showMessage("Xóa thành công!");
-//                    refreshTableData();
-//                } catch (SQLException ex) {
-//                    nhanVienView.showMessage("Lỗi: " + ex.toString());
-//                }
-//            } else {
-//                nhanVienView.showMessage("Vui lòng chọn ít nhất một nhân viên để xóa.");
-//            }
-//        }
-//    }
 
     class UpdateNhanVienListener implements ActionListener {
         @Override
@@ -183,6 +161,7 @@ public class NhanVienController {
                     dao.update(nv);
                     nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
                     nhanVienView.showMessage("Cập nhật thành công!");
+                    refreshTableData();
                 } catch (SQLException e1) {
                     nhanVienView.showMessage(e1.toString());
                 }

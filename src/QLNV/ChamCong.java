@@ -75,6 +75,7 @@ public class ChamCong extends JFrame {
 		table = new JTable(tableModel);
 
 		table.setDefaultRenderer(Object.class, new CustomCellRenderer());
+		table.getTableHeader().setReorderingAllowed(false);
 
 		JScrollPane tableScrollPane = new JScrollPane(table);
 		JPanel bottomPanel = new JPanel();
@@ -237,7 +238,7 @@ public class ChamCong extends JFrame {
 
 	        if (success) {
 	            connection.commit();
-	            showMessage("đã Cập nhật dữ liệu", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+	            showMessage("Đã cập nhật dữ liệu", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
 	        } else {
 	            connection.rollback();
 	            showMessage("Không có dữ liệu để cập nhật.", "Thông báo", JOptionPane.WARNING_MESSAGE);
@@ -274,7 +275,11 @@ public class ChamCong extends JFrame {
 	                int day = col - 2;
 	                Object value = tableModel.getValueAt(row, col);
 	                String hoursWorked = value != null ? value.toString() : "";
-
+	                
+	                if (col <= 2) {
+	                    continue;
+	                }
+	                
 	                boolean isEditable = (userType == UserType.ADMIN) || 
 	                    (userType == UserType.USER && (day == currentDay && month == currentMonth && year == currentYear));
 
