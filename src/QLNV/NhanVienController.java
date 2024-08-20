@@ -101,12 +101,34 @@ public class NhanVienController {
             if (nv != null) {
                 try {
                     dao.insert(nv);
-                    nhanVienView.showListNhanVien(new NhanVienTableModel(dao.getAll()));
+                    refreshTableData();
                     nhanVienView.clearNhanVienInfo();
                     nhanVienView.showMessage("Thêm thành công!");
                 } catch (SQLException e1) {
                     nhanVienView.showMessage("Trùng ID");
                 }
+            }
+        }
+    }
+
+    class DeleteNhanVienListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ArrayList<NhanVien> selectedNhanViens = nhanVienModel.getSelectedNhanViens();
+            if (!selectedNhanViens.isEmpty()) {
+                try {
+                    for (NhanVien nv : selectedNhanViens) {
+                        dao.delete(nv);
+                        nhanVienModel.removeNhanVien(nv);
+                    }
+                    nhanVienView.clearNhanVienInfo();
+                    nhanVienView.showMessage("Xóa thành công!");
+                    refreshTableData();
+                } catch (SQLException ex) {
+                    nhanVienView.showMessage("Lỗi: " + ex.toString());
+                }
+            } else {
+                nhanVienView.showMessage("Vui lòng chọn ít nhất một nhân viên để xóa.");
             }
         }
     }
@@ -130,27 +152,27 @@ public class NhanVienController {
             }
         }
     }
-    class DeleteNhanVienListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ArrayList<NhanVien> selectedNhanViens = nhanVienModel.getSelectedNhanViens();
-            if (!selectedNhanViens.isEmpty()) {
-                try {
-                    for (NhanVien nv : selectedNhanViens) {
-                        dao.delete(nv);
-                        nhanVienModel.removeNhanVien(nv);
-                    }
-                    nhanVienView.clearNhanVienInfo();
-                    nhanVienView.showMessage("Xóa thành công!");
-                    refreshTableData();
-                } catch (SQLException ex) {
-                    nhanVienView.showMessage("Lỗi: " + ex.toString());
-                }
-            } else {
-                nhanVienView.showMessage("Vui lòng chọn ít nhất một nhân viên để xóa.");
-            }
-        }
-    }
+//    class DeleteNhanVienListener implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            ArrayList<NhanVien> selectedNhanViens = nhanVienModel.getSelectedNhanViens();
+//            if (!selectedNhanViens.isEmpty()) {
+//                try {
+//                    for (NhanVien nv : selectedNhanViens) {
+//                        dao.delete(nv);
+//                        nhanVienModel.removeNhanVien(nv);
+//                    }
+//                    nhanVienView.clearNhanVienInfo();
+//                    nhanVienView.showMessage("Xóa thành công!");
+//                    refreshTableData();
+//                } catch (SQLException ex) {
+//                    nhanVienView.showMessage("Lỗi: " + ex.toString());
+//                }
+//            } else {
+//                nhanVienView.showMessage("Vui lòng chọn ít nhất một nhân viên để xóa.");
+//            }
+//        }
+//    }
 
     class UpdateNhanVienListener implements ActionListener {
         @Override

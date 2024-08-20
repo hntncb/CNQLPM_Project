@@ -62,7 +62,6 @@ public class ChamCong extends JFrame {
 		int currentYear = now.get(Calendar.YEAR);
 		monthComboBox.setSelectedItem(currentMonth);
 		yearComboBox.setSelectedItem(currentYear);
-		//JLabel hint = new JLabel("Nhập dữ liệu theo Quy định chấm công rồi bấm lưu để hoàn tất.");
 		JPanel topPanel = new JPanel();
 		topPanel.add(new JLabel("Tháng:"));
 		topPanel.add(monthComboBox);
@@ -75,7 +74,6 @@ public class ChamCong extends JFrame {
 		tableModel = new DefaultTableModel(columnNames, 0);
 		table = new JTable(tableModel);
 
-		// Apply custom renderer
 		table.setDefaultRenderer(Object.class, new CustomCellRenderer());
 
 		JScrollPane tableScrollPane = new JScrollPane(table);
@@ -122,7 +120,6 @@ public class ChamCong extends JFrame {
 		setupDatabase();
 		updateTable();
 
-		// Row selection listener for highlighting the selected row
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent event) {
@@ -132,36 +129,34 @@ public class ChamCong extends JFrame {
 	}
 
 	private class CustomCellRenderer extends DefaultTableCellRenderer {
-	    private final Calendar today = Calendar.getInstance();
+		private final Calendar today = Calendar.getInstance();
 
-	    @Override
-	    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-	        Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-	        int todayDay = today.get(Calendar.DAY_OF_MONTH);
-	        int todayMonth = today.get(Calendar.MONTH) + 1;
-	        int todayYear = today.get(Calendar.YEAR);
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
+			Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			int todayDay = today.get(Calendar.DAY_OF_MONTH);
+			int todayMonth = today.get(Calendar.MONTH) + 1;
+			int todayYear = today.get(Calendar.YEAR);
 
-	        int selectedRow = table.getSelectedRow();
-	        int month = (int) monthComboBox.getSelectedItem();
-	        int year = (int) yearComboBox.getSelectedItem();
+			int selectedRow = table.getSelectedRow();
+			int month = (int) monthComboBox.getSelectedItem();
+			int year = (int) yearComboBox.getSelectedItem();
 
-	        // Default background color gray and default text color black
-	        cell.setBackground(Color.LIGHT_GRAY);
-	        cell.setForeground(Color.BLACK); // Ensure text is black
+			cell.setBackground(Color.LIGHT_GRAY);
+			cell.setForeground(Color.BLACK);
 
-	        // Highlight today's column with white background
-	        if (column == todayDay + 2 && month == todayMonth && year == todayYear) {
-	            cell.setBackground(Color.WHITE);
-	        }
+			if (column == todayDay + 2 && month == todayMonth && year == todayYear) {
+				cell.setBackground(Color.WHITE);
+			}
 
-	        // Highlight selected row with white background and black text
-	        if (selectedRow == row) {
-	            cell.setBackground(Color.WHITE);
-	            cell.setForeground(Color.BLACK); // Set text color to black
-	        }
+			if (selectedRow == row) {
+				cell.setBackground(Color.WHITE);
+				cell.setForeground(Color.BLACK);
+			}
 
-	        return cell;
-	    }
+			return cell;
+		}
 	}
 
 	private void showQuyDinh() {
@@ -230,108 +225,140 @@ public class ChamCong extends JFrame {
 	}
 
 	private void updateDatabase() {
-		int month = (int) monthComboBox.getSelectedItem();
-		int year = (int) yearComboBox.getSelectedItem();
-		Connection connection = null;
+	    int month = (int) monthComboBox.getSelectedItem();
+	    int year = (int) yearComboBox.getSelectedItem();
+	    Connection connection = null;
 
-		try {
-			connection = ConnectionFactory.getInstance().getConnection();
-			connection.setAutoCommit(false); // Tắt auto-commit
+	    try {
+	        connection = ConnectionFactory.getInstance().getConnection();
+	        connection.setAutoCommit(false);
 
-			String updateSql = "UPDATE chamcong SET giolam = ? WHERE id_nhanvien = ? AND YEAR(ngay) = ? AND MONTH(ngay) = ? AND DAY(ngay) = ?";
-			PreparedStatement updateStatement = connection.prepareStatement(updateSql);
+	        boolean success = updateEmployeeData(connection, year, month);
 
-			Calendar now = Calendar.getInstance();
-			int currentDay = now.get(Calendar.DAY_OF_MONTH);
-			int currentMonth = now.get(Calendar.MONTH) + 1;
-			int currentYear = now.get(Calendar.YEAR);
-			boolean invalidEditAttempt = false;
-			boolean invalidInputAttempt = false;
+	        if (success) {
+	            connection.commit();
+	            showMessage("đã Cập nhật dữ liệu", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+	        } else {
+	            connection.rollback();
+	            showMessage("Không có dữ liệu để cập nhật.", "Thông báo", JOptionPane.WARNING_MESSAGE);
+	        }
 
-			for (int row = 0; row < tableModel.getRowCount(); row++) {
-				int employeeId = (int) tableModel.getValueAt(row, 0);
+	    } catch (SQLException e) {
+	        handleSQLException(e, connection);
+	    } finally {
+	        closeConnection(connection);
+	    }
+	}
 
-				for (int col = 3; col < tableModel.getColumnCount(); col++) {
-					int day = col - 2;
-					Object value = tableModel.getValueAt(row, col);
+	private boolean updateEmployeeData(Connection connection, int year, int month) throws SQLException {
+	    Calendar now = Calendar.getInstance();
+	    int currentDay = now.get(Calendar.DAY_OF_MONTH);
+	    int currentMonth = now.get(Calendar.MONTH) + 1;
+	    int currentYear = now.get(Calendar.YEAR);
 
-					String hoursWorked = value != null ? value.toString() : "";
-					if (userType == UserType.USER) {
-						if (day != currentDay || month != currentMonth || year != currentYear) {
-							invalidEditAttempt = true;
-							continue;
-						}
-					}
+	    String checkSql = "SELECT giolam FROM chamcong WHERE id_nhanvien = ? AND YEAR(ngay) = ? AND MONTH(ngay) = ? AND DAY(ngay) = ?";
+	    String updateSql = "UPDATE chamcong SET giolam = ? WHERE id_nhanvien = ? AND YEAR(ngay) = ? AND MONTH(ngay) = ? AND DAY(ngay) = ?";
+	    String insertSql = "INSERT INTO chamcong (id_nhanvien, ngay, giolam) VALUES (?, ?, ?)";
 
-					if (!isValidInput(hoursWorked)) {
-						invalidInputAttempt = true;
-						continue;
-					}
+	    boolean invalidEditAttempt = false;
+	    boolean invalidInputAttempt = false;
 
-					updateStatement.setString(1, hoursWorked);
-					updateStatement.setInt(2, employeeId);
-					updateStatement.setInt(3, year);
-					updateStatement.setInt(4, month);
-					updateStatement.setInt(5, day);
+	    try (PreparedStatement checkStatement = connection.prepareStatement(checkSql);
+	         PreparedStatement updateStatement = connection.prepareStatement(updateSql);
+	         PreparedStatement insertStatement = connection.prepareStatement(insertSql)) {
 
-					updateStatement.addBatch();
-				}
-			}
+	        for (int row = 0; row < tableModel.getRowCount(); row++) {
+	            int employeeId = (int) tableModel.getValueAt(row, 0);
 
-			// Hiển thị thông báo lỗi tổng hợp
-			if (invalidEditAttempt || invalidInputAttempt) {
-				StringBuilder errorMessage = new StringBuilder();
-				if (invalidEditAttempt) {
-					errorMessage.append("Chỉ có thể nhập cho ngày hôm nay!\n");
-				}
-				if (invalidInputAttempt) {
-					errorMessage.append("Có giá trị không hợp lệ. Vui lòng kiểm tra lại và nhập đúng dữ liệu!");
-				}
-				JOptionPane.showMessageDialog(this, errorMessage.toString(), "Lỗi nhập liệu",
-						JOptionPane.ERROR_MESSAGE);
-				connection.rollback(); // Rollback nếu có lỗi
-			} else {
-				updateStatement.executeBatch();
-				connection.commit(); // Commit các thay đổi nếu không có lỗi
-				JOptionPane.showMessageDialog(this, "Cập nhật dữ liệu thành công!", "Thông báo",
-						JOptionPane.INFORMATION_MESSAGE);
-			}
+	            for (int col = 3; col < tableModel.getColumnCount(); col++) {
+	                int day = col - 2;
+	                Object value = tableModel.getValueAt(row, col);
+	                String hoursWorked = value != null ? value.toString() : "";
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi cập nhật dữ liệu.", "Lỗi",
-					JOptionPane.ERROR_MESSAGE);
-			try {
-				if (connection != null) {
-					connection.rollback(); // Rollback nếu có lỗi SQL
-				}
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		} finally {
-			if (connection != null) {
-				try {
-					connection.setAutoCommit(true); // Bật lại auto-commit
-					connection.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	                boolean isEditable = (userType == UserType.ADMIN) || 
+	                    (userType == UserType.USER && (day == currentDay && month == currentMonth && year == currentYear));
+
+	                if (isEditable) {
+	                    if (!hoursWorked.isEmpty()) {
+	                        checkStatement.setInt(1, employeeId);
+	                        checkStatement.setInt(2, year);
+	                        checkStatement.setInt(3, month);
+	                        checkStatement.setInt(4, day);
+	                        ResultSet checkResult = checkStatement.executeQuery();
+
+	                        if (checkResult.next()) {
+	                            updateStatement.setString(1, hoursWorked);
+	                            updateStatement.setInt(2, employeeId);
+	                            updateStatement.setInt(3, year);
+	                            updateStatement.setInt(4, month);
+	                            updateStatement.setInt(5, day);
+	                            updateStatement.addBatch();
+	                        } else {
+	                            java.sql.Date date = java.sql.Date.valueOf(String.format("%d-%02d-%02d", year, month, day));
+	                            insertStatement.setInt(1, employeeId);
+	                            insertStatement.setDate(2, date);
+	                            insertStatement.setString(3, hoursWorked);
+	                            insertStatement.addBatch();
+	                        }
+	                    }
+	                } else if (userType == UserType.USER) {
+	                    invalidEditAttempt = true;
+	                }
+
+	                if (!isValidInput(hoursWorked)) {
+	                    invalidInputAttempt = true;
+	                }
+	            }
+	        }
+
+	        updateStatement.executeBatch();
+	        insertStatement.executeBatch();
+
+	        return !invalidInputAttempt;
+
+	    } catch (SQLException e) {
+	        throw new SQLException("Lỗi khi cập nhật dữ liệu", e);
+	    }
+	}
+
+	private void handleSQLException(SQLException e, Connection connection) {
+	    e.printStackTrace();
+	    showMessage("Có lỗi xảy ra khi cập nhật dữ liệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+	    try {
+	        if (connection != null) {
+	            connection.rollback();
+	        }
+	    } catch (SQLException ex) {
+	        ex.printStackTrace();
+	    }
+	}
+
+	private void closeConnection(Connection connection) {
+	    if (connection != null) {
+	        try {
+	            connection.setAutoCommit(true);
+	            connection.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+
+	private void showMessage(String message, String title, int messageType) {
+	    JOptionPane.showMessageDialog(this, message, title, messageType);
 	}
 
 	private boolean isValidInput(String input) {
-		if (input == null || input.trim().isEmpty()) {
-			return true; // Cho phép ô trống
-		}
+	    if (input == null || input.trim().isEmpty()) {
+	        return true;
+	    }
 
-		// Kiểm tra nếu là số từ 0 đến 24
-		try {
-			int hours = Integer.parseInt(input);
-			return hours >= 0 && hours <= 24;
-		} catch (NumberFormatException e) {
-			return input.matches("H|Nb|NL|Co|K|Ts|N|T|C|P");
-		}
+	    try {
+	        int hours = Integer.parseInt(input);
+	        return hours >= 0 && hours <= 24;
+	    } catch (NumberFormatException e) {
+	        return input.matches("H|Nb|NL|Co|K|Ts|N|T|C|P");
+	    }
 	}
 
 	private void updateTable() {
@@ -343,12 +370,11 @@ public class ChamCong extends JFrame {
 
 		tableModel.setRowCount(0);
 
-		// Đảm bảo số cột không thay đổi nếu không có thêm ngày
+		// Cập nhật số cột ngày
 		while (tableModel.getColumnCount() > 3) {
-			tableModel.setColumnCount(3); // Giữ lại 3 cột cố định
+			tableModel.setColumnCount(3);
 		}
 
-		// Thêm cột ngày nếu chưa có
 		if (tableModel.getColumnCount() <= 3) {
 			for (int i = 1; i <= daysInMonth; i++) {
 				if (tableModel.getColumnCount() <= 3 + i - 1) {
@@ -360,28 +386,29 @@ public class ChamCong extends JFrame {
 		Connection connection = null;
 		try {
 			connection = ConnectionFactory.getInstance().getConnection();
-			String countSql = "SELECT COUNT(DISTINCT t.ID) " + "FROM thong_tin_nhan_vien t "
+
+			// Truy vấn số lượng hàng
+			String countSql = "SELECT COUNT(DISTINCT t.ID) FROM thong_tin_nhan_vien t "
 					+ "LEFT JOIN chamcong c ON t.ID = c.id_nhanvien " + "WHERE YEAR(c.ngay) = ? AND MONTH(c.ngay) = ?";
 			PreparedStatement countStatement = connection.prepareStatement(countSql);
 			countStatement.setInt(1, year);
 			countStatement.setInt(2, month);
-
 			ResultSet countResultSet = countStatement.executeQuery();
 			countResultSet.next();
 			int totalRows = countResultSet.getInt(1);
 			totalPages = (int) Math.ceil(totalRows / (double) rowsPerPage);
 
-			// Lấy dữ liệu cho trang hiện tại
-			String sql = "SELECT t.ID, t.HoTen, SUM(c.giolam) AS TongGioLam " + "FROM thong_tin_nhan_vien t "
+			// Truy vấn dữ liệu nhân viên và tổng số giờ làm
+			String sql = "SELECT t.ID, t.HoTen, SUM(c.giolam) AS TongGioLam FROM thong_tin_nhan_vien t "
 					+ "LEFT JOIN chamcong c ON t.ID = c.id_nhanvien " + "WHERE YEAR(c.ngay) = ? AND MONTH(c.ngay) = ? "
-					+ "GROUP BY t.ID, t.HoTen " + "LIMIT ? OFFSET ?";
+					+ "GROUP BY t.ID, t.HoTen LIMIT ? OFFSET ?";
 			PreparedStatement statement = connection.prepareStatement(sql);
 			statement.setInt(1, year);
 			statement.setInt(2, month);
 			statement.setInt(3, rowsPerPage);
 			statement.setInt(4, (currentPage - 1) * rowsPerPage);
-
 			ResultSet resultSet = statement.executeQuery();
+
 			while (resultSet.next()) {
 				Object[] rowData = new Object[tableModel.getColumnCount()];
 				rowData[0] = resultSet.getInt("ID");
@@ -395,13 +422,14 @@ public class ChamCong extends JFrame {
 				tableModel.addRow(rowData);
 			}
 
-			String dayDetailsSql = "SELECT id_nhanvien, DAY(ngay) AS Ngay, giolam " + "FROM chamcong "
+			// Truy vấn chi tiết ngày
+			String dayDetailsSql = "SELECT id_nhanvien, DAY(ngay) AS Ngay, giolam FROM chamcong "
 					+ "WHERE YEAR(ngay) = ? AND MONTH(ngay) = ?";
 			PreparedStatement dayDetailsStatement = connection.prepareStatement(dayDetailsSql);
 			dayDetailsStatement.setInt(1, year);
 			dayDetailsStatement.setInt(2, month);
-
 			ResultSet dayDetailsResultSet = dayDetailsStatement.executeQuery();
+
 			while (dayDetailsResultSet.next()) {
 				int employeeId = dayDetailsResultSet.getInt("id_nhanvien");
 				int day = dayDetailsResultSet.getInt("Ngay");
@@ -409,7 +437,7 @@ public class ChamCong extends JFrame {
 
 				for (int row = 0; row < tableModel.getRowCount(); row++) {
 					if (tableModel.getValueAt(row, 0).equals(employeeId)) {
-						if (day + 2 < tableModel.getColumnCount()) {
+						if (day >= 1 && day <= daysInMonth) {
 							tableModel.setValueAt(hoursWorked, row, 3 + day - 1);
 						}
 						break;
@@ -417,10 +445,8 @@ public class ChamCong extends JFrame {
 				}
 			}
 
-			// Cập nhật thông tin trang
 			pageInfo.setText("Trang " + currentPage + " / " + totalPages);
 
-			// Đặt kích thước cột
 			TableColumn idColumn = table.getColumnModel().getColumn(0);
 			TableColumn nameColumn = table.getColumnModel().getColumn(1);
 			TableColumn totalHoursColumn = table.getColumnModel().getColumn(2);

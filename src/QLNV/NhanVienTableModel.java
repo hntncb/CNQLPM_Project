@@ -51,7 +51,8 @@ public class NhanVienTableModel extends AbstractTableModel {
     }
 
     public void nextPage() {
-        if ((currentPage + 1) * pageSize < dsNhanVien.size()) {
+        int totalPages = getTotalPages();
+        if (currentPage + 1 < totalPages) {
             currentPage++;
             fireTableDataChanged();
         }

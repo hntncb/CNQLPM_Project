@@ -187,7 +187,7 @@ public class NhanVienView extends JFrame {
         addTextFieldValidator(txtChucVu, TextFieldValidator::isChar);
         addTextFieldValidator(txtDiaChi, TextFieldValidator::isAlphanumeric);
         addTextFieldValidator(txtNamSinh, input -> TextFieldValidator.isDate(input) || input.isEmpty());
-        addTextFieldValidator(txtSDT, input -> TextFieldValidator.isNumber(input) && TextFieldValidator.charLimit(input, 10));
+        addTextFieldValidator(txtSDT, input -> TextFieldValidator.isNumber(input) && TextFieldValidator.charLimit(input, 11));
         addTextFieldValidator(txtSearch, TextFieldValidator::isAlphanumeric);
     }
     private void addTextFieldValidator(JTextField textField, java.util.function.Predicate<String> validator) {
@@ -316,7 +316,7 @@ public class NhanVienView extends JFrame {
     }
     
     public void updatePageInfo(int currentPage, int totalPages) {
-        lblPageInfo.setText("Page " + (currentPage + 1) + " of " + totalPages);
+        lblPageInfo.setText("Trang " + (currentPage + 1) + " / " + totalPages);
     }
 
     public void addNextPageListener(ActionListener listener) {
